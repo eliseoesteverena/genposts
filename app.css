@@ -1,10 +1,10 @@
 /* =========================================================
-   APP SHELL — interfaz del generador (no forma parte del post)
+   APP SHELL
    ========================================================= */
 .app{
   min-height: 100vh;
   background: var(--ink);
-  padding: 1.25rem 1rem 3rem;
+  padding: 1.25rem 1rem 4.5rem; /* espacio abajo para no tapar la pestaña de debug */
 }
 .app-header{
   max-width: 1180px;
@@ -13,7 +13,13 @@
   align-items:center;
   gap:.75rem;
 }
-.app-header svg.logo-mark{ height: 1.9rem; width:1.9rem; flex-shrink:0; }
+.logo-badge-mini{
+  height: 1.9rem; width: 1.9rem; flex-shrink:0;
+  border-radius: var(--r-sm);
+  background: #fff; color:#c0392b;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-sans); font-weight: 800; font-size: .7rem;
+}
 .app-header h1{
   font-family: var(--font-serif);
   color: var(--paper);
@@ -53,9 +59,7 @@
   min-height: 420px;
   overflow: auto;
 }
-.stage-inner{
-  position:relative;
-}
+.stage-inner{ position:relative; }
 
 /* ---------- Control panel ---------- */
 .panel{
@@ -77,11 +81,7 @@
   color: var(--ink-60);
   font-weight:600;
 }
-.panel-hint{
-  font-size: .74rem;
-  color: var(--ink-40);
-  line-height:1.4;
-}
+.panel-hint{ font-size: .74rem; color: var(--ink-40); line-height:1.4; }
 
 .format-row{ display:flex; gap:.5rem; flex-wrap:wrap; }
 .format-row button{
@@ -108,14 +108,6 @@
 }
 .chip-toggle input{ width:1.05rem; height:1.05rem; accent-color: var(--ink); }
 
-.zone-editor{ display:flex; flex-direction:column; gap:.4rem; }
-.zone-editor .zrow{ display:flex; gap:.4rem; }
-.zone-editor input{
-  flex:1;
-  border: var(--line); border-radius: var(--r-sm);
-  padding:.4rem .55rem; font-size:.8rem; font-family: var(--font-sans);
-}
-
 .download-btn{
   display:flex; align-items:center; justify-content:center; gap:.5rem;
   width:100%;
@@ -141,233 +133,117 @@
 .download-btn:disabled{ opacity:.5; cursor:wait; }
 
 /* =========================================================
-   POST — el diseño exportable en sí. Dimensiones en PX reales
-   (1080 de ancho base) para que la exportación sea 1:1 nítida.
+   CANVAS — dibujado 100% por render.js a partir del JSON.
+   Cada .canvas-el es un elemento individual en position:absolute,
+   sin flex ni contenedores anidados.
    ========================================================= */
-.post{
+.canvas{
   position: relative;
-  width: 1080px;
-  background: var(--paper);
+  flex-shrink: 0;
   font-family: var(--font-sans);
-  color: var(--ink);
-  overflow:hidden;
-  flex-shrink:0;
+  overflow: hidden;
 }
-.post[data-format="square"]{ height: 1080px; }
-.post[data-format="portrait"]{ height: 1350px; }
-.post[data-format="story"]{ height: 1920px; }
-
-.post-frame{
-  position:absolute;
-  inset: 40px;
-  border: 3px solid var(--ink);
-  border-radius: 44px;
-  box-shadow: 10px 10px 0 var(--ink);
-  background: var(--paper);
-  display:flex;
-  flex-direction:column;
-  padding: 56px 56px 64px;
-}
-
-/* logo */
-.post-logo{
-  align-self:flex-start;
-  display:flex; align-items:center;
-  background:#fff;
-  border: 3px solid var(--ink);
-  border-radius: 20px;
-  box-shadow: 5px 5px 0 var(--ink);
-  padding: 14px 20px;
-}
-.post-logo svg.logo-mark{ height: 56px; width: 68px; display:block; }
-
-/* doodles */
-.doodle{ position:absolute; color: var(--ink); opacity:.85; }
-
-/* title */
-.post-title{
-  margin-top: 56px;
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: 74px;
-  line-height: 1.08;
-  letter-spacing: -.01em;
-  text-align:left;
-  max-width: 92%;
-}
-.post-title mark{
+.canvas-el{ box-sizing: border-box; }
+.canvas-text{ white-space: pre-wrap; }
+.canvas-text mark{
   background: none;
   color: inherit;
-  position:relative;
-  display:inline;
+  position: relative;
+  display: inline;
 }
-.post-title mark::after{
+.canvas-text mark::after{
   content:'';
   position:absolute;
-  left: -2%; right: -2%; bottom: .02em;
+  left: -2%; right: -2%; bottom: .05em;
   height: .34em;
   background: var(--grad);
   opacity:.55;
   z-index:-1;
   border-radius: 3px;
 }
-
-/* price cards */
-.price-row{
-  margin-top: 48px;
-  display:flex;
-  gap: 24px;
-  flex: 1;
-}
-.price-card{
-  flex:1;
-  border: 3px solid var(--ink);
-  border-radius: 28px;
-  box-shadow: 6px 6px 0 var(--ink);
-  background: var(--card);
-  padding: 28px 30px;
-  display:flex;
-  flex-direction:column;
-  justify-content: space-between;
-  min-height: 220px;
-}
-.price-card .pc-top{ display:flex; align-items:flex-start; justify-content:space-between; gap: .6rem; }
-.price-card .pc-label{
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 30px;
-}
-.price-card .pc-icon{ flex-shrink:0; color: var(--ink); opacity:.85; }
-.price-card .pc-price{
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: 74px;
-  line-height: 1;
-  margin-top: 18px;
-}
-.price-card .pc-price .unit{
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 26px;
-  color: var(--ink-60);
-  margin-left: 6px;
-}
-.price-card.is-accent{ background: var(--yellow-pale); }
-
-/* zones */
-.post-zones{ margin-top: 40px; }
-.post-zones .zt{
-  font-family: var(--font-mono);
-  font-size: 20px;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color: var(--ink-60);
-  font-weight:600;
-  margin-bottom: 12px;
-}
-.post-zones .zlist{
-  display:flex; flex-wrap:wrap; gap: 12px 28px;
-}
-.post-zones .zitem{
-  display:flex; align-items:center; gap: 8px;
-  font-size: 28px; font-weight:600;
-}
-.post-zones .zitem svg{ flex-shrink:0; }
-
-/* cta */
-.post-cta{
-  margin-top: 44px;
-  display:flex;
-  justify-content:center;
-}
-.post-cta a{
-  display:inline-flex; align-items:center; gap: 14px;
-  background: var(--grad);
-  border: 3px solid var(--ink);
-  border-radius: 999px;
-  padding: 22px 44px;
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 34px;
-  color: var(--ink);
-  box-shadow: 6px 6px 0 var(--ink);
-}
-
-.post-url{
-  margin-top: 22px;
-  text-align:center;
-  font-family: var(--font-mono);
-  font-size: 22px;
-  color: var(--ink-60);
-}
+.canvas-icon{ display:flex; align-items:center; justify-content:center; }
+.canvas-icon svg{ width:100%; height:100%; }
+.canvas-image svg, .canvas-image img{ display:block; }
 
 /* =========================================================
-   SELECCIÓN, ARRASTRE Y AGRUPACIÓN
+   PANEL DE DEBUG — el JSON del diseño en tiempo real
    ========================================================= */
-.sel-target{
-  position: relative;
+.debug-tab{
+  position: fixed;
+  left: 1rem; bottom: 0;
+  z-index: 100;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-bottom: none;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  font-family: var(--font-mono);
+  font-size: .74rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  padding: .55rem .9rem;
   cursor: pointer;
 }
-.sel-target.is-selected{
-  outline: 2px dashed #0066ff;
-  outline-offset: 6px;
-  border-radius: 4px;
-}
-.sel-target.is-free{
-  position: absolute !important;
-}
-.sel-target.is-dragging{
-  z-index: 80;
-  opacity: .92;
-}
-.post-group{
-  position: absolute;
-}
-.post-group.is-selected{
-  outline: 2px dashed #ff00cc;
-  outline-offset: 8px;
-}
 
-.sel-handle{
-  position: absolute;
-  top: -36px;
-  left: -2px;
-  width: 32px;
-  height: 32px;
-  background: var(--ink);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
+.debug-drawer{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 99;
+  height: 42vh;
+  max-height: 480px;
+  background: var(--card);
+  border-top: 3px solid var(--ink);
+  box-shadow: 0 -8px 0 rgba(0,0,0,.15);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  line-height: 1;
-  cursor: grab;
-  z-index: 90;
-  box-shadow: 3px 3px 0 rgba(0,0,0,.3);
-  touch-action: none;
-  padding: 0;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform .18s ease;
 }
-.sel-handle:active{ cursor: grabbing; }
+.debug-drawer.is-open{ transform: translateY(0); }
 
-/* Ocultas siempre durante la exportación a JPG */
-.exporting .sel-handle,
-.exporting .sel-target.is-selected,
-.exporting .post-group.is-selected{
-  outline: none !important;
+.debug-drawer-head{
+  display:flex; align-items:center; gap:.75rem;
+  padding: .75rem 1rem;
+  border-bottom: var(--line-soft);
+  flex-shrink:0;
 }
-.exporting .sel-handle{ display: none !important; }
-
-.panel-selection{
-  border-top: 1px dashed var(--ink-15);
-  padding-top: 1.1rem;
+.debug-drawer-head .lbl{
+  font-family: var(--font-mono);
+  font-size:.66rem; letter-spacing:.08em; text-transform:uppercase;
+  color: var(--ink-60); font-weight:600;
 }
-.panel-selection .sub-lbl{ margin-top: .2rem; }
-.panel-selection .format-row button{ font-size: .72rem; padding: .45rem .3rem; }
-.nudge-range{ width: 100%; accent-color: var(--ink); }
-#groupBtn:disabled, #ungroupBtn:disabled, #resetSelBtn:disabled{ opacity:.35; cursor:not-allowed; }
+.debug-drawer-actions{ margin-left:auto; display:flex; gap:.5rem; }
+.debug-mini-btn{
+  border: var(--line); border-radius: var(--r-sm);
+  background: var(--card); color: var(--ink);
+  font-family: var(--font-sans); font-weight:600; font-size:.72rem;
+  padding: .35rem .7rem; cursor:pointer;
+}
+.debug-mini-btn--primary{ background: var(--ink); color:#fff; }
 
-[contenteditable="true"]{ outline: none; cursor: text; }
-[contenteditable="true"]:hover{ background: rgba(245,217,73,.28); border-radius: 4px; }
-[contenteditable="true"]:focus{ background: rgba(245,217,73,.42); border-radius: 4px; }
+.debug-error{
+  margin: 0; padding: .5rem 1rem;
+  background: var(--danger-pale); color: var(--danger);
+  font-family: var(--font-mono); font-size: .74rem;
+  flex-shrink:0;
+}
+
+.debug-textarea{
+  flex: 1;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: .76rem;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--paper);
+  tab-size: 2;
+}
+
+@media (max-width: 640px){
+  .debug-drawer{ height: 60vh; }
+  .debug-tab{ left: .6rem; font-size:.68rem; padding:.5rem .75rem; }
+}
