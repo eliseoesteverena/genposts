@@ -1,0 +1,645 @@
+// Copia embebida de design.json como objeto JS, para que la app funcione
+// también si se abre index.html directamente (sin servidor), donde fetch()
+// a un archivo local puede fallar por CORS. design.json queda como la
+// referencia "oficial" y legible del schema; esta es la copia que corre en runtime.
+window.DEFAULT_DESIGN = {
+  "meta": {
+    "format": "square",
+    "width": 1080,
+    "height": 1080,
+    "background": "#f7f5f0"
+  },
+  "elements": [
+    {
+      "id": "bg-frame",
+      "name": "Marco de fondo",
+      "type": "rect",
+      "x": 40,
+      "y": 40,
+      "width": 1000,
+      "height": 1000,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 0,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "fill": "#f7f5f0",
+        "stroke": "#131211",
+        "strokeWidth": 3,
+        "radius": 44,
+        "shadowX": 10,
+        "shadowY": 10,
+        "shadowColor": "#131211"
+      }
+    },
+    {
+      "id": "sparkle-1",
+      "name": "Destello grande",
+      "type": "icon",
+      "x": 860,
+      "y": 96,
+      "width": 64,
+      "height": 64,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 5,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "name": "sparkle",
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "sparkle-2",
+      "name": "Destello chico 1",
+      "type": "icon",
+      "x": 64,
+      "y": 300,
+      "width": 34,
+      "height": 34,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 5,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "name": "sparkle",
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "sparkle-3",
+      "name": "Destello chico 2",
+      "type": "icon",
+      "x": 930,
+      "y": 540,
+      "width": 46,
+      "height": 46,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 5,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "name": "sparkle",
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "logo-badge",
+      "name": "Placa del logo",
+      "type": "rect",
+      "x": 96,
+      "y": 96,
+      "width": 176,
+      "height": 84,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 9,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "fill": "#ffffff",
+        "stroke": "#131211",
+        "strokeWidth": 3,
+        "radius": 20,
+        "shadowX": 5,
+        "shadowY": 5,
+        "shadowColor": "#131211"
+      }
+    },
+    {
+      "id": "logo-mark",
+      "name": "Isotipo 99copias",
+      "type": "image",
+      "x": 118,
+      "y": 110,
+      "width": 132,
+      "height": 56,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "src": "brand:logo99",
+        "fit": "contain"
+      }
+    },
+    {
+      "id": "title",
+      "name": "Título",
+      "type": "text",
+      "x": 96,
+      "y": 220,
+      "width": 860,
+      "height": 220,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "Impresión rápida\nal mejor precio",
+        "fontFamily": "serif",
+        "fontSize": 74,
+        "fontWeight": 600,
+        "color": "#131211",
+        "lineHeight": 1.08,
+        "align": "left",
+        "highlightWords": [
+          "rápida"
+        ]
+      }
+    },
+    {
+      "id": "price1-card",
+      "name": "Tarjeta B/N",
+      "type": "rect",
+      "x": 96,
+      "y": 478,
+      "width": 415,
+      "height": 224,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 8,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "fill": "#ffffff",
+        "stroke": "#131211",
+        "strokeWidth": 3,
+        "radius": 28,
+        "shadowX": 6,
+        "shadowY": 6,
+        "shadowColor": "#131211"
+      }
+    },
+    {
+      "id": "price1-icon",
+      "name": "Ícono B/N",
+      "type": "icon",
+      "x": 456,
+      "y": 506,
+      "width": 46,
+      "height": 46,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "name": "doc",
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "price1-label",
+      "name": "Label B/N",
+      "type": "text",
+      "x": 128,
+      "y": 506,
+      "width": 300,
+      "height": 40,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "Blanco y Negro",
+        "fontFamily": "sans",
+        "fontSize": 30,
+        "fontWeight": 700,
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "price1-price",
+      "name": "Precio B/N",
+      "type": "text",
+      "x": 128,
+      "y": 584,
+      "width": 260,
+      "height": 90,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "$50",
+        "fontFamily": "serif",
+        "fontSize": 74,
+        "fontWeight": 600,
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "price1-unit",
+      "name": "Unidad B/N",
+      "type": "text",
+      "x": 252,
+      "y": 622,
+      "width": 150,
+      "height": 40,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "/carilla",
+        "fontFamily": "sans",
+        "fontSize": 26,
+        "fontWeight": 600,
+        "color": "rgba(19,18,17,.62)"
+      }
+    },
+    {
+      "id": "price2-card",
+      "name": "Tarjeta Color",
+      "type": "rect",
+      "x": 541,
+      "y": 478,
+      "width": 415,
+      "height": 224,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 8,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "fill": "#faf0c2",
+        "stroke": "#131211",
+        "strokeWidth": 3,
+        "radius": 28,
+        "shadowX": 6,
+        "shadowY": 6,
+        "shadowColor": "#131211"
+      }
+    },
+    {
+      "id": "price2-icon",
+      "name": "Ícono Color",
+      "type": "icon",
+      "x": 901,
+      "y": 506,
+      "width": 46,
+      "height": 46,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "name": "doc",
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "price2-label",
+      "name": "Label Color",
+      "type": "text",
+      "x": 573,
+      "y": 506,
+      "width": 260,
+      "height": 40,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "Color",
+        "fontFamily": "sans",
+        "fontSize": 30,
+        "fontWeight": 700,
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "price2-price",
+      "name": "Precio Color",
+      "type": "text",
+      "x": 573,
+      "y": 584,
+      "width": 280,
+      "height": 90,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "$150",
+        "fontFamily": "serif",
+        "fontSize": 74,
+        "fontWeight": 600,
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "price2-unit",
+      "name": "Unidad Color",
+      "type": "text",
+      "x": 730,
+      "y": 622,
+      "width": 150,
+      "height": 40,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "/carilla",
+        "fontFamily": "sans",
+        "fontSize": 26,
+        "fontWeight": 600,
+        "color": "rgba(19,18,17,.62)"
+      }
+    },
+    {
+      "id": "zones-title",
+      "name": "Título zonas",
+      "type": "text",
+      "x": 96,
+      "y": 748,
+      "width": 400,
+      "height": 32,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "ZONAS DE ENTREGA",
+        "fontFamily": "mono",
+        "fontSize": 20,
+        "fontWeight": 600,
+        "color": "rgba(19,18,17,.62)"
+      }
+    },
+    {
+      "id": "zone1-icon",
+      "name": "Pin 1",
+      "type": "icon",
+      "x": 96,
+      "y": 800,
+      "width": 20,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "name": "pin",
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "zone1-label",
+      "name": "Zona 1",
+      "type": "text",
+      "x": 124,
+      "y": 798,
+      "width": 240,
+      "height": 32,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "Sede UBA Drago",
+        "fontFamily": "sans",
+        "fontSize": 28,
+        "fontWeight": 600,
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "zone2-icon",
+      "name": "Pin 2",
+      "type": "icon",
+      "x": 380,
+      "y": 800,
+      "width": 20,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "name": "pin",
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "zone2-label",
+      "name": "Zona 2",
+      "type": "text",
+      "x": 408,
+      "y": 798,
+      "width": 240,
+      "height": 32,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "Estación Belgrano C",
+        "fontFamily": "sans",
+        "fontSize": 28,
+        "fontWeight": 600,
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "zone3-icon",
+      "name": "Pin 3",
+      "type": "icon",
+      "x": 730,
+      "y": 800,
+      "width": 20,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "name": "pin",
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "zone3-label",
+      "name": "Zona 3",
+      "type": "text",
+      "x": 758,
+      "y": 798,
+      "width": 240,
+      "height": 32,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "Estación Belgrano R",
+        "fontFamily": "sans",
+        "fontSize": 28,
+        "fontWeight": 600,
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "cta-pill",
+      "name": "Botón CTA",
+      "type": "rect",
+      "x": 340,
+      "y": 880,
+      "width": 400,
+      "height": 88,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 8,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "fill": {
+          "type": "linear-gradient",
+          "angle": 90,
+          "stops": [
+            {
+              "color": "#ffb4c6",
+              "offset": 0
+            },
+            {
+              "color": "#ffd7a8",
+              "offset": 22
+            },
+            {
+              "color": "#fff3a0",
+              "offset": 42
+            },
+            {
+              "color": "#c9f0c4",
+              "offset": 62
+            },
+            {
+              "color": "#b8dcff",
+              "offset": 80
+            },
+            {
+              "color": "#d7bdff",
+              "offset": 100
+            }
+          ]
+        },
+        "stroke": "#131211",
+        "strokeWidth": 3,
+        "radius": 999,
+        "shadowX": 6,
+        "shadowY": 6,
+        "shadowColor": "#131211"
+      }
+    },
+    {
+      "id": "cta-label",
+      "name": "Texto CTA",
+      "type": "text",
+      "x": 340,
+      "y": 900,
+      "width": 340,
+      "height": 50,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "Chequeá turnos",
+        "fontFamily": "sans",
+        "fontSize": 34,
+        "fontWeight": 700,
+        "color": "#131211",
+        "align": "center"
+      }
+    },
+    {
+      "id": "cta-arrow",
+      "name": "Flecha CTA",
+      "type": "icon",
+      "x": 670,
+      "y": 900,
+      "width": 34,
+      "height": 50,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "name": "arrow-right",
+        "color": "#131211"
+      }
+    },
+    {
+      "id": "url",
+      "name": "URL",
+      "type": "text",
+      "x": 0,
+      "y": 992,
+      "width": 1080,
+      "height": 40,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 10,
+      "locked": false,
+      "visible": true,
+      "groupId": null,
+      "props": {
+        "text": "app.99copias.com.ar/impresion-rapida",
+        "fontFamily": "mono",
+        "fontSize": 22,
+        "color": "rgba(19,18,17,.62)",
+        "align": "center"
+      }
+    }
+  ]
+};

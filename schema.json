@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://99copias.local/post-design.schema.json",
+  "title": "PostDesign",
+  "description": "Documento que describe por completo un diseño de post para Instagram: el lienzo (meta) y una lista plana de elementos individuales posicionados en absoluto, al estilo capas de Illustrator/Canva. No hay contenedores ni layout flex: cada elemento lleva su propia posición (x, y) en píxeles dentro del lienzo.",
+  "type": "object",
+  "required": ["meta", "elements"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "Configuración del lienzo.",
+      "required": ["format", "width", "height", "background"],
+      "additionalProperties": false,
+      "properties": {
+        "format": { "type": "string", "enum": ["square", "portrait", "story"], "description": "square=1080x1080, portrait=1080x1350, story=1080x1920" },
+        "width":  { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "background": { "type": "string", "description": "Color de fondo del lienzo (hex/rgb/rgba)." }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "description": "Lista plana de capas/elementos individuales, en cualquier orden (el orden visual lo determina zIndex, no la posición en el array).",
+      "items": { "$ref": "#/definitions/element" }
+    }
+  },
+  "definitions": {
+    "element": {
+      "type": "object",
+      "required": ["id", "type", "x", "y", "width", "height", "zIndex", "props"],
+      "properties": {
+        "id":       { "type": "string", "description": "Identificador único y estable de la capa." },
+        "name":     { "type": "string", "description": "Nombre legible para humanos, para un futuro panel de capas." },
+        "type":     { "type": "string", "enum": ["rect", "text", "icon", "image"] },
+        "x":        { "type": "number", "description": "Posición absoluta desde el borde izquierdo del lienzo, en px." },
+        "y":        { "type": "number", "description": "Posición absoluta desde el borde superior del lienzo, en px." },
+        "width":    { "type": "number", "minimum": 0 },
+        "height":   { "type": "number", "minimum": 0 },
+        "rotation": { "type": "number", "default": 0, "description": "Grados, sentido horario." },
+        "opacity":  { "type": "number", "minimum": 0, "maximum": 1, "default": 1 },
+        "zIndex":   { "type": "integer", "description": "Orden de apilado (mayor = más arriba)." },
+        "locked":   { "type": "boolean", "default": false, "description": "Reservado para la UI futura: impide seleccionar/arrastrar." },
+        "visible":  { "type": "boolean", "default": true },
+        "groupId":  { "type": ["string", "null"], "default": null, "description": "Reservado para agrupación futura: id del grupo al que pertenece, o null." },
+        "props":    { "description": "Propiedades específicas según 'type'.", "oneOf": [
+          { "$ref": "#/definitions/rectProps" },
+          { "$ref": "#/definitions/textProps" },
+          { "$ref": "#/definitions/iconProps" },
+          { "$ref": "#/definitions/imageProps" }
+        ]}
+      }
+    },
+    "colorOrGradient": {
+      "oneOf": [
+        { "type": "string", "description": "Color sólido (hex/rgb/rgba)." },
+        {
+          "type": "object",
+          "required": ["type", "angle", "stops"],
+          "properties": {
+            "type": { "const": "linear-gradient" },
+            "angle": { "type": "number" },
+            "stops": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["color", "offset"],
+                "properties": {
+                  "color": { "type": "string" },
+                  "offset": { "type": "number", "minimum": 0, "maximum": 100 }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "rectProps": {
+      "type": "object",
+      "required": ["fill"],
+      "properties": {
+        "fill":        { "$ref": "#/definitions/colorOrGradient" },
+        "stroke":      { "type": "string" },
+        "strokeWidth": { "type": "number", "default": 0 },
+        "radius":      { "type": "number", "default": 0 },
+        "shadowX":     { "type": "number", "default": 0 },
+        "shadowY":     { "type": "number", "default": 0 },
+        "shadowColor": { "type": "string" }
+      }
+    },
+    "textProps": {
+      "type": "object",
+      "required": ["text", "fontFamily", "fontSize", "color"],
+      "properties": {
+        "text":           { "type": "string", "description": "Texto plano; usar \\n para salto de línea." },
+        "fontFamily":      { "type": "string", "enum": ["serif", "sans", "mono"], "description": "Mapea a --font-serif/--font-sans/--font-mono del design system." },
+        "fontSize":       { "type": "number" },
+        "fontWeight":     { "type": "number", "default": 400 },
+        "color":          { "type": "string" },
+        "lineHeight":     { "type": "number", "default": 1.2 },
+        "align":          { "type": "string", "enum": ["left", "center", "right"], "default": "left" },
+        "highlightWords": { "type": "array", "items": { "type": "string" }, "description": "Palabras/frases dentro de 'text' que se resaltan con un marcador degradé (estilo brand)." }
+      }
+    },
+    "iconProps": {
+      "type": "object",
+      "required": ["name", "color"],
+      "properties": {
+        "name":  { "type": "string", "enum": ["sparkle", "doc", "pin", "arrow-right"] },
+        "color": { "type": "string" }
+      }
+    },
+    "imageProps": {
+      "type": "object",
+      "required": ["src", "fit"],
+      "properties": {
+        "src": { "type": "string", "description": "'brand:logo99' para el isotipo de marca embebido, o una URL/data-URI." },
+        "fit": { "type": "string", "enum": ["contain", "cover"], "default": "contain" }
+      }
+    }
+  }
+}
