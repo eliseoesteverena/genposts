@@ -37,6 +37,7 @@
   window.addEventListener('image:request-upload', (e) => openModal(e.detail.elementId));
   closeBtn.addEventListener('click', closeModal);
   modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
 
   dropzone.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', () => {
@@ -73,12 +74,22 @@
     statusEl.textContent = 'Subiendo…';
     dropzone.classList.remove('is-error');
 
+    // Si el fetch se cuelga (Function que nunca responde, red caída, etc.) no queremos
+    // un "Subiendo…" eterno: lo cortamos a los 20s y lo tratamos como error.
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
     try {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch(UPLOAD_ENDPOINT, { method: 'POST', body: formData });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const res = await fetch(UPLOAD_ENDPOINT, { method: 'POST', body: formData, signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!res.ok) {
+        let detail = '';
+        try { detail = (await res.json()).error || ''; } catch (_) {}
+        throw new Error('HTTP ' + res.status + (detail ? ' — ' + detail : ''));
+      }
       const data = await res.json();
       if (!data.url) throw new Error('La respuesta no incluyó "url".');
 
@@ -88,8 +99,11 @@
           props: { ...el.props, src: data.url, status: 'ready' }
         });
       }
-      closeModal();
+      statusEl.textContent = '¡Listo! ✓';
+      setTimeout(closeModal, 500);
     } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') err = new Error('Se agotó el tiempo de espera (20s) — el servidor no respondió.');
       console.error('Error subiendo a R2:', err);
       if (targetElementId) {
         const el = window.PostEngine.getElement(targetElementId);
