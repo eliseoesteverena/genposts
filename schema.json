@@ -2,7 +2,8 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://99copias.local/post-design.schema.json",
   "title": "PostDesign",
-  "description": "Documento que describe por completo un diseño de post para Instagram: el lienzo (meta) y una lista plana de elementos individuales posicionados en absoluto, al estilo capas de Illustrator/Canva. No hay contenedores ni layout flex: cada elemento lleva su propia posición (x, y) en píxeles dentro del lienzo.",
+  "version": "2.0.0",
+  "description": "Documento que describe por completo un diseño de post: el lienzo (meta), un set de tokens de diseño DTCG opcional (tokens) y una lista plana de elementos individuales posicionados en absoluto (elements), al estilo capas de Illustrator/Canva. Cualquier propiedad de color/dimensión/tipografía dentro de 'props' acepta un valor literal O una referencia a un token con sintaxis '{grupo.token}' (ver TOKENS.md). No hay contenedores ni layout flex.",
   "type": "object",
   "required": ["meta", "elements"],
   "additionalProperties": false,
@@ -13,47 +14,37 @@
       "required": ["format", "width", "height", "background"],
       "additionalProperties": false,
       "properties": {
-        "format": { "type": "string", "enum": ["square", "portrait", "story"], "description": "square=1080x1080, portrait=1080x1350, story=1080x1920" },
-        "width":  { "type": "integer", "minimum": 1 },
-        "height": { "type": "integer", "minimum": 1 },
-        "background": { "type": "string", "description": "Color de fondo del lienzo (hex/rgb/rgba)." }
+        "format":     { "type": "string", "enum": ["square", "portrait", "story"], "description": "square=1080x1080, portrait=1080x1350, story=1080x1920" },
+        "width":      { "type": "integer", "minimum": 1 },
+        "height":     { "type": "integer", "minimum": 1 },
+        "background": { "$ref": "#/definitions/tokenOrColor" }
       }
+    },
+    "tokens": {
+      "description": "Opcional. Tokens DTCG 2025.10 que sobreescriben/extienden a tokens.json solo para este documento. Mismo formato que tokens.json (ver TOKENS.md). Úsese para variaciones puntuales; los tokens del proyecto viven en tokens.json.",
+      "type": "object"
     },
     "elements": {
       "type": "array",
-      "description": "Lista plana de capas/elementos individuales, en cualquier orden (el orden visual lo determina zIndex, no la posición en el array).",
+      "description": "Lista plana de capas/elementos individuales. El orden visual lo determina zIndex, no la posición en el array.",
       "items": { "$ref": "#/definitions/element" }
     }
   },
   "definitions": {
-    "element": {
-      "type": "object",
-      "required": ["id", "type", "x", "y", "width", "height", "zIndex", "props"],
-      "properties": {
-        "id":       { "type": "string", "description": "Identificador único y estable de la capa." },
-        "name":     { "type": "string", "description": "Nombre legible para humanos, para un futuro panel de capas." },
-        "type":     { "type": "string", "enum": ["rect", "text", "icon", "image"] },
-        "x":        { "type": "number", "description": "Posición absoluta desde el borde izquierdo del lienzo, en px." },
-        "y":        { "type": "number", "description": "Posición absoluta desde el borde superior del lienzo, en px." },
-        "width":    { "type": "number", "minimum": 0 },
-        "height":   { "type": "number", "minimum": 0 },
-        "rotation": { "type": "number", "default": 0, "description": "Grados, sentido horario." },
-        "opacity":  { "type": "number", "minimum": 0, "maximum": 1, "default": 1 },
-        "zIndex":   { "type": "integer", "description": "Orden de apilado (mayor = más arriba)." },
-        "locked":   { "type": "boolean", "default": false, "description": "Reservado para la UI futura: impide seleccionar/arrastrar." },
-        "visible":  { "type": "boolean", "default": true },
-        "groupId":  { "type": ["string", "null"], "default": null, "description": "Reservado para agrupación futura: id del grupo al que pertenece, o null." },
-        "props":    { "description": "Propiedades específicas según 'type'.", "oneOf": [
-          { "$ref": "#/definitions/rectProps" },
-          { "$ref": "#/definitions/textProps" },
-          { "$ref": "#/definitions/iconProps" },
-          { "$ref": "#/definitions/imageProps" }
-        ]}
-      }
+    "tokenRef": {
+      "type": "string",
+      "pattern": "^\\{[A-Za-z0-9_.\\-]+\\}$",
+      "description": "Referencia a un token DTCG, ej. '{color.semantic.text}'. Se resuelve contra tokens.json + meta.tokens en tiempo de render."
     },
-    "colorOrGradient": {
+    "tokenOrColor":     { "oneOf": [ { "type": "string" }, { "$ref": "#/definitions/tokenRef" } ] },
+    "tokenOrDimension": { "oneOf": [ { "type": "number" }, { "$ref": "#/definitions/tokenRef" } ] },
+    "tokenOrFontFamily":{ "oneOf": [ { "type": "string", "enum": ["serif","sans","mono"] }, { "$ref": "#/definitions/tokenRef" } ] },
+    "tokenOrFontWeight":{ "oneOf": [ { "type": "number" }, { "$ref": "#/definitions/tokenRef" } ] },
+    "tokenOrGradient": {
+      "description": "Color sólido, gradiente inline, o referencia a un token $type:gradient.",
       "oneOf": [
-        { "type": "string", "description": "Color sólido (hex/rgb/rgba)." },
+        { "type": "string" },
+        { "$ref": "#/definitions/tokenRef" },
         {
           "type": "object",
           "required": ["type", "angle", "stops"],
@@ -65,27 +56,51 @@
               "items": {
                 "type": "object",
                 "required": ["color", "offset"],
-                "properties": {
-                  "color": { "type": "string" },
-                  "offset": { "type": "number", "minimum": 0, "maximum": 100 }
-                }
+                "properties": { "color": { "type": "string" }, "offset": { "type": "number", "minimum": 0, "maximum": 100 } }
               }
             }
           }
         }
       ]
     },
+
+    "element": {
+      "type": "object",
+      "required": ["id", "type", "x", "y", "width", "height", "zIndex", "props"],
+      "properties": {
+        "id":       { "type": "string", "description": "Identificador único y estable de la capa." },
+        "name":     { "type": "string", "description": "Nombre legible para humanos (panel de capas)." },
+        "type":     { "type": "string", "enum": ["rect", "text", "icon", "image"] },
+        "x":        { "type": "number" },
+        "y":        { "type": "number" },
+        "width":    { "type": "number", "minimum": 0 },
+        "height":   { "type": "number", "minimum": 0 },
+        "rotation": { "type": "number", "default": 0 },
+        "opacity":  { "type": "number", "minimum": 0, "maximum": 1, "default": 1 },
+        "zIndex":   { "type": "integer" },
+        "locked":   { "type": "boolean", "default": false },
+        "visible":  { "type": "boolean", "default": true },
+        "groupId":  { "type": ["string", "null"], "default": null },
+        "props":    { "oneOf": [
+          { "$ref": "#/definitions/rectProps" },
+          { "$ref": "#/definitions/textProps" },
+          { "$ref": "#/definitions/iconProps" },
+          { "$ref": "#/definitions/imageProps" }
+        ]}
+      }
+    },
+
     "rectProps": {
       "type": "object",
       "required": ["fill"],
       "properties": {
-        "fill":        { "$ref": "#/definitions/colorOrGradient" },
-        "stroke":      { "type": "string" },
-        "strokeWidth": { "type": "number", "default": 0 },
-        "radius":      { "type": "number", "default": 0 },
-        "shadowX":     { "type": "number", "default": 0 },
-        "shadowY":     { "type": "number", "default": 0 },
-        "shadowColor": { "type": "string" }
+        "fill":        { "$ref": "#/definitions/tokenOrGradient" },
+        "stroke":      { "$ref": "#/definitions/tokenOrColor" },
+        "strokeWidth": { "$ref": "#/definitions/tokenOrDimension" },
+        "radius":      { "$ref": "#/definitions/tokenOrDimension" },
+        "shadowX":     { "$ref": "#/definitions/tokenOrDimension" },
+        "shadowY":     { "$ref": "#/definitions/tokenOrDimension" },
+        "shadowColor": { "$ref": "#/definitions/tokenOrColor" }
       }
     },
     "textProps": {
@@ -93,13 +108,13 @@
       "required": ["text", "fontFamily", "fontSize", "color"],
       "properties": {
         "text":           { "type": "string", "description": "Texto plano; usar \\n para salto de línea." },
-        "fontFamily":      { "type": "string", "enum": ["serif", "sans", "mono"], "description": "Mapea a --font-serif/--font-sans/--font-mono del design system." },
-        "fontSize":       { "type": "number" },
-        "fontWeight":     { "type": "number", "default": 400 },
-        "color":          { "type": "string" },
+        "fontFamily":      { "$ref": "#/definitions/tokenOrFontFamily" },
+        "fontSize":       { "$ref": "#/definitions/tokenOrDimension" },
+        "fontWeight":     { "$ref": "#/definitions/tokenOrFontWeight" },
+        "color":          { "$ref": "#/definitions/tokenOrColor" },
         "lineHeight":     { "type": "number", "default": 1.2 },
         "align":          { "type": "string", "enum": ["left", "center", "right"], "default": "left" },
-        "highlightWords": { "type": "array", "items": { "type": "string" }, "description": "Palabras/frases dentro de 'text' que se resaltan con un marcador degradé (estilo brand)." }
+        "highlightWords": { "type": "array", "items": { "type": "string" } }
       }
     },
     "iconProps": {
@@ -107,15 +122,20 @@
       "required": ["name", "color"],
       "properties": {
         "name":  { "type": "string", "enum": ["sparkle", "doc", "pin", "arrow-right"] },
-        "color": { "type": "string" }
+        "color": { "$ref": "#/definitions/tokenOrColor" }
       }
     },
     "imageProps": {
       "type": "object",
       "required": ["src", "fit"],
       "properties": {
-        "src": { "type": "string", "description": "'brand:logo99' para el isotipo de marca embebido, o una URL/data-URI." },
-        "fit": { "type": "string", "enum": ["contain", "cover"], "default": "contain" }
+        "src": {
+          "type": ["string", "null"],
+          "description": "'brand:logo99' para el isotipo embebido; una URL http(s) (típicamente de R2, ver UPLOAD.md); o null si es un placeholder vacío esperando que el usuario suba una imagen."
+        },
+        "fit":    { "type": "string", "enum": ["contain", "cover"], "default": "contain" },
+        "alt":    { "type": "string" },
+        "status": { "type": "string", "enum": ["empty", "uploading", "ready"], "default": "empty", "description": "Estado del placeholder de subida. 'empty' y src=null → la UI muestra el dropzone. 'ready' con src seteado → imagen final." }
       }
     }
   }

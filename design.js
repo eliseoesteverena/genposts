@@ -1,13 +1,12 @@
-// Copia embebida de design.json como objeto JS, para que la app funcione
-// también si se abre index.html directamente (sin servidor), donde fetch()
-// a un archivo local puede fallar por CORS. design.json queda como la
-// referencia "oficial" y legible del schema; esta es la copia que corre en runtime.
+// Copia embebida de design.json (ver nota igual en design.js anterior: evita fallas de
+// fetch()/CORS si index.html se abre directo con file://). tokens.json tiene su propia
+// copia embebida en tokens.js por el mismo motivo.
 window.DEFAULT_DESIGN = {
   "meta": {
     "format": "square",
     "width": 1080,
     "height": 1080,
-    "background": "#f7f5f0"
+    "background": "{color.semantic.surface}"
   },
   "elements": [
     {
@@ -25,13 +24,13 @@ window.DEFAULT_DESIGN = {
       "visible": true,
       "groupId": null,
       "props": {
-        "fill": "#f7f5f0",
-        "stroke": "#131211",
-        "strokeWidth": 3,
+        "fill": "{color.semantic.surface}",
+        "stroke": "{color.semantic.border}",
+        "strokeWidth": "{dimension.stroke-width.bold}",
         "radius": 44,
-        "shadowX": 10,
-        "shadowY": 10,
-        "shadowColor": "#131211"
+        "shadowX": "{dimension.shadow-offset.lg}",
+        "shadowY": "{dimension.shadow-offset.lg}",
+        "shadowColor": "{color.semantic.shadow}"
       }
     },
     {
@@ -50,7 +49,7 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "name": "sparkle",
-        "color": "#131211"
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -69,7 +68,7 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "name": "sparkle",
-        "color": "#131211"
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -88,7 +87,7 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "name": "sparkle",
-        "color": "#131211"
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -106,13 +105,13 @@ window.DEFAULT_DESIGN = {
       "visible": true,
       "groupId": null,
       "props": {
-        "fill": "#ffffff",
-        "stroke": "#131211",
-        "strokeWidth": 3,
-        "radius": 20,
-        "shadowX": 5,
-        "shadowY": 5,
-        "shadowColor": "#131211"
+        "fill": "{color.semantic.surface-card}",
+        "stroke": "{color.semantic.border}",
+        "strokeWidth": "{dimension.stroke-width.bold}",
+        "radius": "{dimension.radius.lg}",
+        "shadowX": "{dimension.shadow-offset.sm}",
+        "shadowY": "{dimension.shadow-offset.sm}",
+        "shadowColor": "{color.semantic.shadow}"
       }
     },
     {
@@ -131,7 +130,8 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "src": "brand:logo99",
-        "fit": "contain"
+        "fit": "contain",
+        "status": "ready"
       }
     },
     {
@@ -150,10 +150,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "Impresión rápida\nal mejor precio",
-        "fontFamily": "serif",
+        "fontFamily": "{fontFamily.serif}",
         "fontSize": 74,
-        "fontWeight": 600,
-        "color": "#131211",
+        "fontWeight": "{fontWeight.semibold}",
+        "color": "{color.semantic.text}",
         "lineHeight": 1.08,
         "align": "left",
         "highlightWords": [
@@ -176,13 +176,13 @@ window.DEFAULT_DESIGN = {
       "visible": true,
       "groupId": null,
       "props": {
-        "fill": "#ffffff",
-        "stroke": "#131211",
-        "strokeWidth": 3,
-        "radius": 28,
-        "shadowX": 6,
-        "shadowY": 6,
-        "shadowColor": "#131211"
+        "fill": "{color.semantic.surface-card}",
+        "stroke": "{color.semantic.border}",
+        "strokeWidth": "{dimension.stroke-width.bold}",
+        "radius": "{dimension.radius.xl}",
+        "shadowX": "{dimension.shadow-offset.md}",
+        "shadowY": "{dimension.shadow-offset.md}",
+        "shadowColor": "{color.semantic.shadow}"
       }
     },
     {
@@ -201,7 +201,7 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "name": "doc",
-        "color": "#131211"
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -220,10 +220,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "Blanco y Negro",
-        "fontFamily": "sans",
+        "fontFamily": "{fontFamily.sans}",
         "fontSize": 30,
-        "fontWeight": 700,
-        "color": "#131211"
+        "fontWeight": "{fontWeight.bold}",
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -242,10 +242,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "$50",
-        "fontFamily": "serif",
+        "fontFamily": "{fontFamily.serif}",
         "fontSize": 74,
-        "fontWeight": 600,
-        "color": "#131211"
+        "fontWeight": "{fontWeight.semibold}",
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -264,10 +264,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "/carilla",
-        "fontFamily": "sans",
+        "fontFamily": "{fontFamily.sans}",
         "fontSize": 26,
-        "fontWeight": 600,
-        "color": "rgba(19,18,17,.62)"
+        "fontWeight": "{fontWeight.semibold}",
+        "color": "{color.semantic.text-muted}"
       }
     },
     {
@@ -285,13 +285,13 @@ window.DEFAULT_DESIGN = {
       "visible": true,
       "groupId": null,
       "props": {
-        "fill": "#faf0c2",
-        "stroke": "#131211",
-        "strokeWidth": 3,
-        "radius": 28,
-        "shadowX": 6,
-        "shadowY": 6,
-        "shadowColor": "#131211"
+        "fill": "{color.semantic.surface-accent}",
+        "stroke": "{color.semantic.border}",
+        "strokeWidth": "{dimension.stroke-width.bold}",
+        "radius": "{dimension.radius.xl}",
+        "shadowX": "{dimension.shadow-offset.md}",
+        "shadowY": "{dimension.shadow-offset.md}",
+        "shadowColor": "{color.semantic.shadow}"
       }
     },
     {
@@ -310,7 +310,7 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "name": "doc",
-        "color": "#131211"
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -329,10 +329,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "Color",
-        "fontFamily": "sans",
+        "fontFamily": "{fontFamily.sans}",
         "fontSize": 30,
-        "fontWeight": 700,
-        "color": "#131211"
+        "fontWeight": "{fontWeight.bold}",
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -351,10 +351,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "$150",
-        "fontFamily": "serif",
+        "fontFamily": "{fontFamily.serif}",
         "fontSize": 74,
-        "fontWeight": 600,
-        "color": "#131211"
+        "fontWeight": "{fontWeight.semibold}",
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -373,10 +373,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "/carilla",
-        "fontFamily": "sans",
+        "fontFamily": "{fontFamily.sans}",
         "fontSize": 26,
-        "fontWeight": 600,
-        "color": "rgba(19,18,17,.62)"
+        "fontWeight": "{fontWeight.semibold}",
+        "color": "{color.semantic.text-muted}"
       }
     },
     {
@@ -395,10 +395,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "ZONAS DE ENTREGA",
-        "fontFamily": "mono",
+        "fontFamily": "{fontFamily.mono}",
         "fontSize": 20,
-        "fontWeight": 600,
-        "color": "rgba(19,18,17,.62)"
+        "fontWeight": "{fontWeight.semibold}",
+        "color": "{color.semantic.text-muted}"
       }
     },
     {
@@ -417,7 +417,7 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "name": "pin",
-        "color": "#131211"
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -436,10 +436,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "Sede UBA Drago",
-        "fontFamily": "sans",
+        "fontFamily": "{fontFamily.sans}",
         "fontSize": 28,
-        "fontWeight": 600,
-        "color": "#131211"
+        "fontWeight": "{fontWeight.semibold}",
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -458,7 +458,7 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "name": "pin",
-        "color": "#131211"
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -477,10 +477,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "Estación Belgrano C",
-        "fontFamily": "sans",
+        "fontFamily": "{fontFamily.sans}",
         "fontSize": 28,
-        "fontWeight": 600,
-        "color": "#131211"
+        "fontWeight": "{fontWeight.semibold}",
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -499,7 +499,7 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "name": "pin",
-        "color": "#131211"
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -518,10 +518,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "Estación Belgrano R",
-        "fontFamily": "sans",
+        "fontFamily": "{fontFamily.sans}",
         "fontSize": 28,
-        "fontWeight": 600,
-        "color": "#131211"
+        "fontWeight": "{fontWeight.semibold}",
+        "color": "{color.semantic.text}"
       }
     },
     {
@@ -539,42 +539,13 @@ window.DEFAULT_DESIGN = {
       "visible": true,
       "groupId": null,
       "props": {
-        "fill": {
-          "type": "linear-gradient",
-          "angle": 90,
-          "stops": [
-            {
-              "color": "#ffb4c6",
-              "offset": 0
-            },
-            {
-              "color": "#ffd7a8",
-              "offset": 22
-            },
-            {
-              "color": "#fff3a0",
-              "offset": 42
-            },
-            {
-              "color": "#c9f0c4",
-              "offset": 62
-            },
-            {
-              "color": "#b8dcff",
-              "offset": 80
-            },
-            {
-              "color": "#d7bdff",
-              "offset": 100
-            }
-          ]
-        },
-        "stroke": "#131211",
-        "strokeWidth": 3,
-        "radius": 999,
-        "shadowX": 6,
-        "shadowY": 6,
-        "shadowColor": "#131211"
+        "fill": "{gradient.brand-rainbow}",
+        "stroke": "{color.semantic.border}",
+        "strokeWidth": "{dimension.stroke-width.bold}",
+        "radius": "{dimension.radius.full}",
+        "shadowX": "{dimension.shadow-offset.md}",
+        "shadowY": "{dimension.shadow-offset.md}",
+        "shadowColor": "{color.semantic.shadow}"
       }
     },
     {
@@ -593,10 +564,10 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "Chequeá turnos",
-        "fontFamily": "sans",
+        "fontFamily": "{fontFamily.sans}",
         "fontSize": 34,
-        "fontWeight": 700,
-        "color": "#131211",
+        "fontWeight": "{fontWeight.bold}",
+        "color": "{color.semantic.text}",
         "align": "center"
       }
     },
@@ -616,7 +587,28 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "name": "arrow-right",
-        "color": "#131211"
+        "color": "{color.semantic.text}"
+      }
+    },
+    {
+      "id": "feature-photo",
+      "name": "Foto (subir)",
+      "type": "image",
+      "x": 96,
+      "y": 478,
+      "width": 0,
+      "height": 0,
+      "rotation": 0,
+      "opacity": 1,
+      "zIndex": 7,
+      "locked": false,
+      "visible": false,
+      "groupId": null,
+      "props": {
+        "src": null,
+        "fit": "cover",
+        "alt": "Foto del local",
+        "status": "empty"
       }
     },
     {
@@ -635,9 +627,9 @@ window.DEFAULT_DESIGN = {
       "groupId": null,
       "props": {
         "text": "app.99copias.com.ar/impresion-rapida",
-        "fontFamily": "mono",
+        "fontFamily": "{fontFamily.mono}",
         "fontSize": 22,
-        "color": "rgba(19,18,17,.62)",
+        "color": "{color.semantic.text-muted}",
         "align": "center"
       }
     }

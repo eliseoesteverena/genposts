@@ -27,41 +27,73 @@
       </div>
     </div>
 
-    <aside class="panel">
-      <div class="panel-group">
-        <span class="lbl">Formato</span>
-        <div class="format-row" id="formatRow">
-          <button data-format="square" class="is-on">1:1</button>
-          <button data-format="portrait">4:5</button>
-          <button data-format="story">9:16</button>
+    <aside class="panel-stack">
+
+      <div class="panel">
+        <div class="panel-group">
+          <span class="lbl">Formato</span>
+          <div class="format-row" id="formatRow">
+            <button data-format="square" class="is-on">1:1</button>
+            <button data-format="portrait">4:5</button>
+            <button data-format="story">9:16</button>
+          </div>
+        </div>
+
+        <div class="panel-group">
+          <span class="lbl">Elementos</span>
+          <label class="chip-toggle">
+            <input type="checkbox" id="toggleDoodles" checked>
+            Mostrar destellos decorativos
+          </label>
+        </div>
+
+        <div class="panel-group">
+          <span class="lbl">Descargar</span>
+          <button class="download-btn" id="downloadBtn">Descargar JPG HD</button>
         </div>
       </div>
 
-      <div class="panel-group">
-        <span class="lbl">Elementos</span>
-        <label class="chip-toggle">
-          <input type="checkbox" id="toggleDoodles" checked>
-          Mostrar destellos decorativos
-        </label>
-        <p class="panel-hint">La edición visual (seleccionar, arrastrar, agrupar) llega en el próximo paso. Por ahora, el diseño se controla 100% desde el JSON — abrí el panel de abajo.</p>
+      <div class="panel" id="inspector">
+        <div class="panel-group">
+          <span class="lbl">Inspector</span>
+          <p class="panel-hint" id="inspectorEmpty">Tocá un elemento del diseño para ver y editar sus propiedades acá.</p>
+          <div id="inspectorBody" class="insp-body" hidden>
+            <div class="insp-head">
+              <strong id="inspectorTitle">-</strong>
+              <span class="insp-type-badge" id="inspectorType">-</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="panel-group">
-        <span class="lbl">Descargar</span>
-        <button class="download-btn" id="downloadBtn">
-          Descargar JPG HD
-        </button>
-        <p class="panel-hint">Exporta a resolución nativa (hasta 2160px de ancho) lista para subir a Instagram.</p>
-      </div>
     </aside>
 
   </div>
 </div>
 
-<button type="button" id="debugTab" class="debug-tab" aria-expanded="false" aria-controls="debugDrawer">&lt;/&gt; JSON ▸</button>
+<div class="upload-modal" id="uploadModal" hidden>
+  <div class="upload-modal-card">
+    <div class="upload-modal-head">
+      <span class="lbl">Subir imagen</span>
+      <button type="button" id="uploadClose" class="debug-mini-btn">Cerrar</button>
+    </div>
+    <div class="upload-dropzone" id="uploadDropzone">
+      <span class="img-ph-icon">+</span>
+      <span>Arrastra una imagen aca, o toca para elegirla</span>
+      <input type="file" id="uploadFileInput" accept="image/*" hidden>
+    </div>
+    <p class="upload-status" id="uploadStatus" hidden></p>
+  </div>
+</div>
+
+<div class="bottom-tabs">
+  <button type="button" id="debugTab" class="bottom-tab" aria-expanded="false" aria-controls="debugDrawer">JSON</button>
+  <button type="button" id="tokensTab" class="bottom-tab" aria-expanded="false" aria-controls="tokensDrawer">Tokens</button>
+</div>
+
 <div class="debug-drawer" id="debugDrawer">
   <div class="debug-drawer-head">
-    <span class="lbl">Documento JSON del diseño (en vivo)</span>
+    <span class="lbl">design.json (en vivo)</span>
     <div class="debug-drawer-actions">
       <button type="button" id="debugCopy" class="debug-mini-btn">Copiar</button>
       <button type="button" id="debugApply" class="debug-mini-btn debug-mini-btn--primary">Aplicar cambios</button>
@@ -71,9 +103,25 @@
   <textarea id="debugJson" class="debug-textarea" spellcheck="false"></textarea>
 </div>
 
+<div class="debug-drawer" id="tokensDrawer">
+  <div class="debug-drawer-head">
+    <span class="lbl">tokens.json - DTCG 2025.10 (en vivo)</span>
+    <div class="debug-drawer-actions">
+      <button type="button" id="tokensCopy" class="debug-mini-btn">Copiar</button>
+      <button type="button" id="tokensApply" class="debug-mini-btn debug-mini-btn--primary">Aplicar cambios</button>
+    </div>
+  </div>
+  <p class="debug-error" id="tokensError" hidden></p>
+  <textarea id="tokensJson" class="debug-textarea" spellcheck="false"></textarea>
+</div>
+
 <script src="design.js"></script>
+<script src="tokens.js"></script>
 <script src="render.js"></script>
 <script src="app.js"></script>
+<script src="inspector.js"></script>
+<script src="upload.js"></script>
 <script src="debug.js"></script>
+<script src="tokens-panel.js"></script>
 </body>
 </html>
