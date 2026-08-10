@@ -124,3 +124,46 @@ no hay `align-self` ni auto-centrado del lienzo, solo del texto dentro de su pro
 - No generes un `rect` gigante como "fondo de sección" si en realidad el fondo del lienzo
   (`meta.background`) ya resuelve eso — usá `rect` solo para formas visibles con su propio
   borde/sombra/radio (tarjetas, botones, placas).
+
+## 7. Cuando el usuario adjunta una imagen de referencia
+
+Adjuntar capturas/diseños de referencia junto al pedido es **una entrada válida y esperada**,
+no un caso especial. El usuario no debería necesitar una plantilla de prompt separada para
+esto — si hay una imagen adjunta, tratala como la fuente principal de intención visual y
+seguí estas reglas al traducirla a elementos:
+
+1. **Regla de decisión logo/foto vs. geometría**: si una región de la referencia es un
+   wordmark de marca, un isotipo, o una fotografía real (no reconstruible con `rect`/`text`/
+   `icon`), generá un elemento `image` con `src: null, status: "empty"` y un `alt` descriptivo
+   — nunca intentes reconstruir un logo trazo por trazo con primitivas. Si en cambio es una
+   forma geométrica simple (círculo, tarjeta redondeada, línea), sí se reconstruye con
+   primitivas nativas.
+2. **Medí proporciones relativas, no way píxeles absolutos de la imagen de referencia.** La
+   referencia puede tener cualquier resolución; convertí posiciones a proporción del lienzo
+   (`x_ref / ancho_imagen_ref * meta.width`) para que la composición se mantenga fiel sin
+   importar el tamaño real de la captura.
+3. **Si un efecto visual de la referencia no tiene primitiva equivalente** (ver §8), generá
+   la mejor aproximación posible con lo que sí existe, y marcá el elemento con un `name` que
+   empiece con `"LIMITACION:"` explicando qué se perdió (ej. `"LIMITACION: la muesca superior
+   es un rect superpuesto, no un corte real"`). Esto es preferible a fallar silenciosamente o
+   a inventar una primitiva que el renderer no entiende.
+4. **No copies el conteo exacto de elementos decorativos repetidos sin criterio.** Si la
+   referencia tiene una espiral de 20 anillos, usá el espaciado real mas una cantidad
+   razonable para el alto disponible — no hace falta contar el original pixel a pixel.
+
+## 8. Limitaciones conocidas del schema actual (v2)
+
+Estas son honestas, no las escondas generando algo que parezca correcto y no lo sea:
+
+- **Sin `clip-path`/formas cóncavas.** No se pueden recortar muescas, arcos invertidos, ni
+  polígonos arbitrarios. Solo rectángulos con esquinas redondeadas (`radius`).
+- **Sin `blur`/`filter`.** No hay manchas de luz difuminadas ni glassmorphism real.
+- **Solo `linear-gradient`.** No hay `radial-gradient`, así que un blob de luz radial se
+  aproxima con un círculo de gradiente lineal — el resultado es más "duro" que el original.
+- **`text` no tiene `height` automático.** El agente debe estimar cuánto ocupa un bloque de
+  texto a mano, y typicamente lo hace mal (ver ejemplo real en la sesión de prueba de este
+  proyecto). Hasta que el renderer soporte alto automático, dejá más aire del que parece
+  necesario entre un bloque de texto largo y lo que va después, y preferí revisar/ajustar el
+  resultado en el inspector antes de exportar.
+- **Sin `textDecoration`/`underline` nativo.** Se aproxima con un `rect` fino debajo del
+  texto, posicionado a mano por línea — fragil si el texto se edita después.

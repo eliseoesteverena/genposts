@@ -347,7 +347,7 @@
       "visible": true,
       "groupId": null,
       "props": {
-        "text": "$150",
+        "text": "$250",
         "fontFamily": "{fontFamily.serif}",
         "fontSize": 74,
         "fontWeight": "{fontWeight.semibold}",
