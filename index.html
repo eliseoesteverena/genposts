@@ -38,9 +38,34 @@
 
     <section class="view" data-view="design-system" hidden>
       <div class="view-inner">
-        <h1 class="view-title">Design system - <span class="ds-brand-name">-</span></h1>
-        <p class="panel-hint">Estos tokens (formato DTCG) son la fuente de verdad visual. Editalos aca y se propagan a todo lo que los referencie.</p>
-        <div class="ds-tokens-body"></div>
+        <h1 class="view-title">Tu marca - <span class="ds-brand-name">-</span></h1>
+        <p class="panel-hint">Elegi tus colores, tipografias y estilo. Se aplican a todo lo que generes despues.</p>
+
+        <div class="bk-preview" id="bkPreview">
+          <span class="bk-preview-eyebrow">Marca</span>
+          <h3 class="bk-preview-title">Titulo de ejemplo</h3>
+          <p class="bk-preview-body">Asi se va a ver el texto en tus disenos.</p>
+          <span class="bk-preview-chip">Acento</span>
+        </div>
+
+        <div class="bk-section">
+          <span class="bk-section-title">Colores</span>
+          <div class="bk-color-grid" id="bkColors"></div>
+        </div>
+
+        <div class="bk-section">
+          <span class="bk-section-title">Tipografia</span>
+          <div class="bk-font-grid" id="bkFonts"></div>
+        </div>
+
+        <div class="bk-section">
+          <span class="bk-section-title">Estilo</span>
+          <div class="bk-preset-grid" id="bkPresets"></div>
+        </div>
+
+        <button type="button" class="fld-mini-btn bk-advanced-toggle" id="bkAdvancedToggle">Personalizar en detalle (avanzado) &gt;</button>
+        <div class="ds-tokens-body" id="bkAdvancedBody" hidden></div>
+
         <button type="button" class="download-btn ds-next-btn" style="max-width:280px;">Siguiente: Componentes</button>
       </div>
     </section>
