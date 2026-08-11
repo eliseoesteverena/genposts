@@ -116,6 +116,17 @@
   function num(v){ const r = resolveToken(v); return typeof r === 'number' ? r : parseFloat(r) || 0; }
   function col(v){ return resolveToken(v); }
 
+  // Al escalar por cambio de formato, un valor que era una referencia a token
+  // ("{dimension.radius.lg}") se "hornea" a su valor literal resuelto * escala:
+  // escalar el TOKEN en sí afectaría a todos los demás elementos que lo
+  // referencian, no solo a este. Es una conversión con pérdida (deja de estar
+  // atado al token), pero es el comportamiento correcto para esta operación.
+  function scaleNumericProp(value, s){
+    const resolved = resolveToken(value);
+    const n = typeof resolved === 'number' ? resolved : parseFloat(resolved);
+    return isNaN(n) ? value : n * s;
+  }
+
   function buildElementNode(el){
     const wrap = document.createElement('div');
     wrap.className = 'canvas-el';
@@ -211,7 +222,34 @@
     setFormat(format){
       const size = FORMAT_SIZES[format];
       if (!size) return;
-      design.meta.format = format; design.meta.width = size.width; design.meta.height = size.height;
+      const oldW = design.meta.width, oldH = design.meta.height;
+      const newW = size.width, newH = size.height;
+
+      if (newH > oldH) {
+        // Lienzo más alto (ej. cuadrado -> story): no se achica nada, solo se
+        // recentra verticalmente el contenido existente en el nuevo alto.
+        const dy = (newH - oldH) / 2;
+        design.elements.forEach(el => { el.y += dy; });
+      } else if (newH < oldH) {
+        // Lienzo más bajo (ej. story -> cuadrado): se escala todo
+        // uniformemente para que quepa en el nuevo alto, y se recentra
+        // horizontalmente lo que haya quedado más angosto que el ancho.
+        const s = newH / oldH;
+        const offsetX = (newW - oldW * s) / 2;
+        design.elements.forEach(el => {
+          el.x = el.x * s + offsetX;
+          el.y = el.y * s;
+          el.width = el.width * s;
+          el.height = el.height * s;
+          const p = el.props;
+          if (!p) return;
+          ['fontSize', 'radius', 'strokeWidth', 'shadowX', 'shadowY'].forEach(k => {
+            if (k in p) p[k] = scaleNumericProp(p[k], s);
+          });
+        });
+      }
+
+      design.meta.format = format; design.meta.width = newW; design.meta.height = newH;
       renderDesign();
     },
     setElementVisible(id, visible){

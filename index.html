@@ -2,74 +2,106 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>99copias — Generador de posts</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Studio - generador de posts</title>
 <link rel="stylesheet" href="design-system.css">
 <link rel="stylesheet" href="app.css">
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
-<div class="app">
-  <header class="app-header">
-    <span class="logo-badge-mini" aria-hidden="true">99</span>
-    <h1>Generador de posts</h1>
-    <span class="tag">Instagram · JSON-driven</span>
+<div class="shell">
+  <header class="shell-header">
+    <span class="shell-logo">◆</span>
+    <span class="shell-title">Studio</span>
+    <nav class="step-nav">
+      <button type="button" class="step-btn" data-step="brands" onclick="Router.go('#/brands')">1. Marca</button>
+      <button type="button" class="step-btn" data-step="design-system">2. Tokens</button>
+      <button type="button" class="step-btn" data-step="components">3. Componentes</button>
+      <button type="button" class="step-btn" data-step="editor">4. Editor</button>
+    </nav>
   </header>
 
-  <div class="app-body">
+  <main class="shell-main">
 
-    <div class="stage">
-      <div class="stage-inner" id="stageInner">
-        <div class="canvas" id="canvas"></div>
+    <section class="view" data-view="brands" hidden>
+      <div class="view-inner">
+        <h1 class="view-title">Tus marcas</h1>
+        <p class="panel-hint">Cada marca tiene su propio design system, componentes y disenos.</p>
+        <form class="brand-create">
+          <input type="text" placeholder="Nombre de la marca nueva" required>
+          <button type="submit" class="download-btn" style="width:auto;">Crear marca</button>
+        </form>
+        <div class="brand-list"></div>
       </div>
-    </div>
+    </section>
 
-    <aside class="panel-stack">
-
-      <div class="panel">
-        <div class="panel-group">
-          <span class="lbl">Formato</span>
-          <div class="format-row" id="formatRow">
-            <button data-format="square" class="is-on">1:1</button>
-            <button data-format="portrait">4:5</button>
-            <button data-format="story">9:16</button>
-          </div>
-        </div>
-
-        <div class="panel-group">
-          <span class="lbl">Elementos</span>
-          <label class="chip-toggle">
-            <input type="checkbox" id="toggleDoodles" checked>
-            Mostrar destellos decorativos
-          </label>
-        </div>
-
-        <div class="panel-group">
-          <span class="lbl">Descargar</span>
-          <button class="download-btn" id="downloadBtn">Descargar JPG HD</button>
-        </div>
+    <section class="view" data-view="design-system" hidden>
+      <div class="view-inner">
+        <h1 class="view-title">Design system - <span class="ds-brand-name">-</span></h1>
+        <p class="panel-hint">Estos tokens (formato DTCG) son la fuente de verdad visual. Editalos aca y se propagan a todo lo que los referencie.</p>
+        <div class="ds-tokens-body"></div>
+        <button type="button" class="download-btn ds-next-btn" style="max-width:280px;">Siguiente: Componentes</button>
       </div>
+    </section>
 
-      <div class="panel" id="inspector">
-        <div class="panel-group">
-          <span class="lbl">Inspector</span>
-          <p class="panel-hint" id="inspectorEmpty">Tocá un elemento del diseño para ver y editar sus propiedades acá.</p>
-          <div id="inspectorBody" class="insp-body" hidden>
-            <div class="insp-head">
-              <strong id="inspectorTitle">-</strong>
-              <span class="insp-type-badge" id="inspectorType">-</span>
-            </div>
-          </div>
-        </div>
+    <section class="view" data-view="components" hidden>
+      <div class="view-inner">
+        <h1 class="view-title">Componentes</h1>
+        <p class="panel-hint">Grupos de elementos reusables ("recetas") que despues se insertan en cualquier diseno desde el editor.</p>
+        <form class="cmp-create">
+          <input type="text" placeholder="Nombre del componente nuevo" required>
+          <button type="submit" class="download-btn" style="width:auto;">Crear</button>
+        </form>
+        <div class="cmp-grid"></div>
+        <button type="button" class="download-btn cmp-next-btn" style="max-width:280px;">Siguiente: Editor</button>
       </div>
 
-    </aside>
+      <div class="cmp-editor" hidden>
+        <div class="cmp-editor-head">
+          <strong class="cmp-editor-title">-</strong>
+          <button type="button" class="fld-mini-btn cmp-editor-close">Cerrar</button>
+        </div>
+        <div class="cmp-editor-body"></div>
+      </div>
+    </section>
 
-  </div>
+    <section class="view view-editor" data-view="editor" hidden>
+      <div class="editor-toolbar">
+        <strong class="editor-design-name">-</strong>
+        <div class="format-row" id="formatRow">
+          <button data-format="square" class="is-on">1:1</button>
+          <button data-format="portrait">4:5</button>
+          <button data-format="story">9:16</button>
+        </div>
+        <select id="insertComponentBtn" class="fld-select"><option value="">+ Insertar componente...</option></select>
+        <label class="chip-toggle chip-toggle--compact">
+          <input type="checkbox" id="toggleDoodles" checked> Destellos
+        </label>
+        <button class="download-btn editor-download" id="downloadBtn">Descargar JPG</button>
+      </div>
+
+      <div class="stage">
+        <div class="stage-inner" id="stageInner">
+          <div class="canvas" id="canvas"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
 </div>
+
+<div class="insp-drawer-backdrop" id="inspDrawerBackdrop"></div>
+<aside class="insp-drawer" id="inspDrawer">
+  <div class="insp-drawer-head">
+    <div>
+      <strong id="inspDrawerTitle">-</strong>
+      <span class="fld-badge is-literal" id="inspDrawerType">-</span>
+    </div>
+    <button type="button" class="fld-mini-btn" id="inspDrawerClose">Cerrar</button>
+  </div>
+  <div class="insp-drawer-body" id="inspDrawerBody"></div>
+</aside>
 
 <div class="upload-modal" id="uploadModal" hidden>
   <div class="upload-modal-card">
@@ -86,42 +118,18 @@
   </div>
 </div>
 
-<div class="bottom-tabs">
-  <button type="button" id="debugTab" class="bottom-tab" aria-expanded="false" aria-controls="debugDrawer">JSON</button>
-  <button type="button" id="tokensTab" class="bottom-tab" aria-expanded="false" aria-controls="tokensDrawer">Tokens</button>
-</div>
-
-<div class="debug-drawer" id="debugDrawer">
-  <div class="debug-drawer-head">
-    <span class="lbl">design.json (en vivo)</span>
-    <div class="debug-drawer-actions">
-      <button type="button" id="debugCopy" class="debug-mini-btn">Copiar</button>
-      <button type="button" id="debugApply" class="debug-mini-btn debug-mini-btn--primary">Aplicar cambios</button>
-    </div>
-  </div>
-  <p class="debug-error" id="debugError" hidden></p>
-  <textarea id="debugJson" class="debug-textarea" spellcheck="false"></textarea>
-</div>
-
-<div class="debug-drawer" id="tokensDrawer">
-  <div class="debug-drawer-head">
-    <span class="lbl">tokens.json - DTCG 2025.10 (en vivo)</span>
-    <div class="debug-drawer-actions">
-      <button type="button" id="tokensCopy" class="debug-mini-btn">Copiar</button>
-      <button type="button" id="tokensApply" class="debug-mini-btn debug-mini-btn--primary">Aplicar cambios</button>
-    </div>
-  </div>
-  <p class="debug-error" id="tokensError" hidden></p>
-  <textarea id="tokensJson" class="debug-textarea" spellcheck="false"></textarea>
-</div>
-
-<script src="design.js?v=2"></script>
 <script src="tokens.js"></script>
+<script src="design.js"></script>
+<script src="components.js"></script>
+<script src="store.js"></script>
+<script src="fields.js"></script>
 <script src="render.js"></script>
-<script src="app.js"></script>
-<script src="inspector.js"></script>
 <script src="upload.js"></script>
-<script src="debug.js"></script>
-<script src="tokens-panel.js"></script>
+<script src="router.js"></script>
+<script src="screen-brands.js"></script>
+<script src="screen-design-system.js"></script>
+<script src="screen-components.js"></script>
+<script src="editor.js"></script>
+<script>Router.start();</script>
 </body>
 </html>
