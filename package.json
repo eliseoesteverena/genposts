@@ -1,0 +1,10 @@
+{
+  "name": "studio-app",
+  "private": true,
+  "description": "Generador de posts con IA - marca, componentes y editor. Ver AUTH.md, UPLOAD.md, AI_CONTRACT.md.",
+  "dependencies": {
+    "better-auth": "latest",
+    "kysely": "latest",
+    "kysely-d1": "latest"
+  }
+}

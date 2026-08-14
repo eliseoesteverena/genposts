@@ -20,8 +20,9 @@
   function loadDesign(designId, dsId){
     let record = designId ? Store.getDesign(designId) : null;
     if (!record) {
-      const list = Store.listDesigns(dsId);
-      record = list[0] || Store.createDesign(dsId, {
+      // Sin designId explicito: siempre es "post nuevo" (ver boton "+ Nuevo post"
+      // en la pantalla de Mis posts) - nunca reutilizamos uno existente por accidente.
+      record = Store.createDesign(dsId, {
         name: 'Diseno sin titulo',
         document: { meta: { format: 'square', width: 1080, height: 1080, background: '{color.semantic.surface}' }, elements: [] }
       });
@@ -29,6 +30,7 @@
     }
     currentDesign = record;
     const ds = Store.getDesignSystem(dsId);
+    Store.setLastActiveBrandId(ds.brandId);
     PostEngine.setTokens(JSON.parse(JSON.stringify(ds.tokens)));
     PostEngine.setDesign(JSON.parse(JSON.stringify(record.document)));
     el().querySelector('.editor-design-name').textContent = record.name;
@@ -163,6 +165,12 @@
       if (!cmpId) return;
       insertComponent(cmpId);
     });
+
+    document.querySelector('.editor-back-btn').addEventListener('click', () => {
+      Router.go('#/design-system/' + currentDesign.designSystemId + '/posts');
+    });
+
+    document.querySelector('.insp-ai-btn').addEventListener('click', editSelectedElementWithAi);
   }
 
   function refreshComponentPicker(){
@@ -187,6 +195,35 @@
       }));
     });
     PostEngine.setDesign(design);
+  }
+
+  async function editSelectedElementWithAi(){
+    if (!selectedId) return;
+    const promptInput = document.querySelector('.insp-ai-prompt');
+    const status = document.querySelector('.insp-ai-status');
+    const prompt = promptInput.value.trim();
+    if (!prompt) { status.hidden = false; status.classList.add('is-error'); status.textContent = 'Escribi que ajuste queres.'; return; }
+
+    const btn = document.querySelector('.insp-ai-btn');
+    btn.disabled = true;
+    status.hidden = false; status.classList.remove('is-error'); status.textContent = 'Aplicando...';
+
+    try {
+      const design = PostEngine.getDesign();
+      const elDef = design.elements.find(e => e.id === selectedId);
+      const ds = Store.getDesignSystem(currentDesign.designSystemId);
+      const newProps = await AI.editElement(prompt, elDef, ds.tokens);
+      Object.assign(elDef.props, newProps);
+      PostEngine.setDesign(design);
+      promptInput.value = '';
+      status.textContent = 'Listo.';
+      renderInspector();
+    } catch (err) {
+      status.classList.add('is-error');
+      status.textContent = 'Error: ' + err.message;
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   async function downloadJpg(){

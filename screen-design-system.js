@@ -8,20 +8,6 @@
     { key: 'accent',     label: 'Acento de marca', hint: 'Detalles, chips y toques de color.', path: 'color.primitive.yellow' }
   ];
 
-  const FONT_STACKS = {
-    heading: [
-      { name: 'Editorial serif', value: "'Fraunces', Georgia, 'Times New Roman', serif" },
-      { name: 'Clasica serif',   value: "Georgia, 'Times New Roman', serif" },
-      { name: 'Moderna sans',    value: "'Geist Sans', -apple-system, 'Segoe UI', sans-serif" },
-      { name: 'Redondeada',      value: "'Trebuchet MS', -apple-system, sans-serif" }
-    ],
-    body: [
-      { name: 'Sans neutra',   value: "'Geist Sans', -apple-system, 'Segoe UI', sans-serif" },
-      { name: 'Sistema',       value: "-apple-system, 'Segoe UI', Roboto, sans-serif" },
-      { name: 'Monoespaciada', value: "'Geist Mono', ui-monospace, 'SFMono-Regular', monospace" }
-    ]
-  };
-
   const STYLE_PRESETS = [
     {
       id: 'cuaderno', name: 'Cuaderno', desc: 'Bordes marcados, sombra dura, mucho caracter.',
@@ -119,7 +105,52 @@
   function renderFonts(ds){
     const wrap = document.getElementById('bkFonts');
     wrap.innerHTML = '';
-    [['heading', 'Titulos', 'fontFamily.serif'], ['body', 'Texto', 'fontFamily.sans']].forEach(function(entry){
+
+    // --- opcion principal: pares curados con nombre, no fuentes sueltas ---
+    const currentHeading = getValue(ds.tokens, 'fontFamily.serif');
+    const currentBody = getValue(ds.tokens, 'fontFamily.sans');
+
+    const pairGrid = document.createElement('div');
+    pairGrid.className = 'bk-pair-grid';
+    FontPairs.list.forEach(function(pair){
+      const headingStack = FontPairs.cssStack(pair.heading);
+      const bodyStack = FontPairs.cssStack(pair.body);
+      const isSelected = currentHeading === headingStack && currentBody === bodyStack;
+
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'bk-pair-card' + (isSelected ? ' is-selected' : '');
+      card.innerHTML =
+        '<span class="bk-pair-sample" style="font-family:' + headingStack + '; font-weight:' + pair.headingWeight + ';">Aa</span>' +
+        '<span class="bk-pair-info"><strong>' + pair.name + '</strong>' +
+        '<small style="font-family:' + bodyStack + ';">' + pair.heading + ' + ' + pair.body + '</small></span>';
+      card.addEventListener('click', function(){
+        setValue(ds.tokens, 'fontFamily.serif', headingStack);
+        setValue(ds.tokens, 'fontFamily.sans', bodyStack);
+        saveTokens(ds);
+        pairGrid.querySelectorAll('.bk-pair-card').forEach(function(c){ c.classList.remove('is-selected'); });
+        card.classList.add('is-selected');
+        updatePreview(ds);
+      });
+      pairGrid.appendChild(card);
+    });
+    wrap.appendChild(pairGrid);
+
+    // --- avanzado: romper el par y elegir cada rol por separado ---
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'fld-mini-btn bk-font-separate-toggle';
+    toggle.textContent = 'Elegir titulo y texto por separado';
+    const separateBody = document.createElement('div');
+    separateBody.hidden = true;
+    toggle.addEventListener('click', function(){
+      separateBody.hidden = !separateBody.hidden;
+      toggle.textContent = separateBody.hidden ? 'Elegir titulo y texto por separado' : 'Ocultar seleccion por separado';
+    });
+    wrap.appendChild(toggle);
+    wrap.appendChild(separateBody);
+
+    [['heading', 'Titulo', 'fontFamily.serif'], ['body', 'Texto', 'fontFamily.sans']].forEach(function(entry){
       const kind = entry[0], label = entry[1], path = entry[2];
       const block = document.createElement('div');
       block.className = 'bk-font-block';
@@ -129,22 +160,32 @@
       block.appendChild(h);
 
       const currentValue = getValue(ds.tokens, path);
-      FONT_STACKS[kind].forEach(function(opt){
+      // reusamos las mismas familias curadas, listadas individualmente, para
+      // que "por separado" siga siendo Google Fonts reales, no un stack distinto
+      const seen = {};
+      FontPairs.list.forEach(function(pair){
+        const fam = kind === 'heading' ? pair.heading : pair.body;
+        const weight = kind === 'heading' ? pair.headingWeight : pair.bodyWeight;
+        if (seen[fam]) return;
+        seen[fam] = true;
+        const stack = FontPairs.cssStack(fam);
         const card = document.createElement('button');
         card.type = 'button';
-        card.className = 'bk-font-card' + (currentValue === opt.value ? ' is-selected' : '');
-        card.style.fontFamily = opt.value;
-        card.innerHTML = '<span class="bk-font-sample">Aa</span><span class="bk-font-name">' + opt.name + '</span>';
+        card.className = 'bk-font-card' + (currentValue === stack ? ' is-selected' : '');
+        card.style.fontFamily = stack;
+        card.style.fontWeight = weight;
+        card.innerHTML = '<span class="bk-font-sample">Aa</span><span class="bk-font-name">' + fam + '</span>';
         card.addEventListener('click', function(){
-          setValue(ds.tokens, path, opt.value);
+          setValue(ds.tokens, path, stack);
           saveTokens(ds);
           block.querySelectorAll('.bk-font-card').forEach(function(c){ c.classList.remove('is-selected'); });
           card.classList.add('is-selected');
+          pairGrid.querySelectorAll('.bk-pair-card').forEach(function(c){ c.classList.remove('is-selected'); }); // ya no matchea ningun par curado
           updatePreview(ds);
         });
         block.appendChild(card);
       });
-      wrap.appendChild(block);
+      separateBody.appendChild(block);
     });
   }
 
@@ -256,6 +297,48 @@
     };
   }
 
+  function updateUndoButton(ds){
+    const btn = document.querySelector('[data-view="design-system"] .bk-undo-btn');
+    btn.disabled = !Store.canUndoTokens(ds.id);
+  }
+
+  async function regenerateWithAi(ds){
+    const el = document.querySelector('[data-view="design-system"]');
+    const promptInput = el.querySelector('.bk-ai-prompt');
+    const status = el.querySelector('.bk-ai-status');
+    const prompt = promptInput.value.trim();
+    if (!prompt) { status.hidden = false; status.textContent = 'Escribi que ajuste queres.'; status.classList.add('is-error'); return; }
+
+    const btn = el.querySelector('.bk-ai-btn');
+    btn.disabled = true;
+    status.hidden = false; status.classList.remove('is-error'); status.textContent = 'Generando...';
+
+    try {
+      const partial = await AI.generateBrand(prompt, ds.tokens, []);
+      const validation = Validate.validateBrandTokens(partial);
+      if (!validation.valid) throw new Error(validation.errors.join('; '));
+      Store.mergeAiTokens(ds.id, partial); // guarda snapshot previo automaticamente
+      promptInput.value = '';
+      status.textContent = 'Listo. Podes deshacer este cambio si no te convence.';
+      renderColors(ds); renderFonts(ds); renderPresets(ds); updatePreview(ds);
+      updateUndoButton(ds);
+    } catch (err) {
+      status.classList.add('is-error');
+      status.textContent = 'Error: ' + err.message;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function undoLastAiChange(ds){
+    if (!Store.canUndoTokens(ds.id)) return;
+    Store.undoTokens(ds.id);
+    renderColors(ds); renderFonts(ds); renderPresets(ds); updatePreview(ds);
+    updateUndoButton(ds);
+    const status = document.querySelector('[data-view="design-system"] .bk-ai-status');
+    status.hidden = false; status.classList.remove('is-error'); status.textContent = 'Deshecho.';
+  }
+
   function render(params){
     const el = document.querySelector('[data-view="design-system"]');
     const brand = Store.getBrand(params.brandId);
@@ -264,16 +347,21 @@
 
     el.querySelector('.ds-brand-name').textContent = brand ? brand.name : '-';
     if (!ds) return;
+    Store.setLastActiveBrandId(brand.id);
 
     renderColors(ds);
     renderFonts(ds);
     renderPresets(ds);
     updatePreview(ds);
+    updateUndoButton(ds);
     wireAdvancedToggle(ds);
     document.getElementById('bkAdvancedBody').hidden = true;
     document.getElementById('bkAdvancedToggle').textContent = 'Personalizar en detalle (avanzado) >';
 
-    el.querySelector('.ds-next-btn').onclick = function(){ Router.go('#/design-system/' + ds.id + '/components'); };
+    el.querySelector('.bk-ai-btn').onclick = function(){ regenerateWithAi(ds); };
+    el.querySelector('.bk-undo-btn').onclick = function(){ undoLastAiChange(ds); };
+    el.querySelector('.ds-components-btn').onclick = function(){ Router.go('#/design-system/' + ds.id + '/components'); };
+    el.querySelector('.ds-done-btn').onclick = function(){ Router.go('#/'); };
   }
 
   Router.register('design-system', render);

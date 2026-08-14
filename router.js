@@ -1,60 +1,74 @@
 (function(){
-  /* =========================================================
-     ROUTER — wizard de 3 pasos sobre hash routes, sin build step.
-     #/brands                                -> paso 0: elegir/crear marca
-     #/brands/:brandId/design-system         -> paso 1: tokens
-     #/design-system/:dsId/components        -> paso 2: componentes
-     #/design-system/:dsId/editor/:designId? -> paso 3: editor
-
-     Cada vista es un <section data-view="..."> ya presente en el DOM
-     (no se genera/destruye en cada navegación); el router solo la
-     muestra/oculta y le pasa los params a su función refresh().
-     ========================================================= */
-
   const views = {};
   let current = null;
 
   function register(name, refresh){
     const el = document.querySelector('[data-view="' + name + '"]');
     if (!el) { console.error('Router: no existe [data-view="' + name + '"]'); return; }
-    views[name] = { el, refresh };
+    views[name] = { el: el, refresh: refresh };
   }
 
   function parse(hash){
     hash = (hash || '').replace(/^#\/?/, '');
     const parts = hash.split('/').filter(Boolean);
 
+    if (parts.length === 0) return { view: 'home', params: {} };
+    if (parts[0] === 'auth') return { view: 'auth', params: {} };
+    if (parts[0] === 'brands' && parts.length === 1) return { view: 'brands', params: {} };
     if (parts[0] === 'brands' && parts[1] && parts[2] === 'design-system')
       return { view: 'design-system', params: { brandId: parts[1] } };
+    if (parts[0] === 'pick-brand' && parts[1])
+      return { view: 'pick-brand', params: { for: parts[1] } };
     if (parts[0] === 'design-system' && parts[1] && parts[2] === 'components')
       return { view: 'components', params: { dsId: parts[1] } };
+    if (parts[0] === 'design-system' && parts[1] && parts[2] === 'posts')
+      return { view: 'posts', params: { dsId: parts[1] } };
     if (parts[0] === 'design-system' && parts[1] && parts[2] === 'editor')
       return { view: 'editor', params: { dsId: parts[1], designId: parts[3] || null } };
-    return { view: 'brands', params: {} };
+    return { view: 'home', params: {} };
   }
 
   function dispatch(){
-    const { view, params } = parse(location.hash);
+    const parsed = parse(location.hash);
+    const view = parsed.view, params = parsed.params;
     if (!views[view]) return;
     if (current && current !== view) views[current].el.hidden = true;
     views[view].el.hidden = false;
     current = view;
     if (params.dsId) window.Router.lastDsId = params.dsId;
     views[view].refresh(params);
-    updateBreadcrumb(view, params);
+    updateActiveNav(view);
+    closeSidebar();
     window.scrollTo(0, 0);
   }
 
-  function updateBreadcrumb(view){
-    document.querySelectorAll('.step-nav [data-step]').forEach(btn => {
-      btn.classList.toggle('is-active', btn.dataset.step === view);
+  function updateActiveNav(view){
+    document.querySelectorAll('.side-nav [data-nav]').forEach(function(btn){
+      btn.classList.toggle('is-active', btn.dataset.nav === view);
     });
   }
 
+  function closeSidebar(){
+    const sb = document.getElementById('sidebar');
+    const bd = document.getElementById('sidebarBackdrop');
+    if (sb) sb.classList.remove('is-open');
+    if (bd) bd.classList.remove('is-open');
+  }
+
+  function goToSection(section){
+    const lastBrandId = Store.getLastActiveBrandId();
+    if (lastBrandId && Store.getBrand(lastBrandId)) {
+      const ds = Store.listDesignSystems(lastBrandId)[0];
+      if (ds) { location.hash = '#/design-system/' + ds.id + '/' + section; return; }
+    }
+    location.hash = '#/pick-brand/' + section;
+  }
+
   window.Router = {
-    register,
+    register: register,
     start(){ window.addEventListener('hashchange', dispatch); dispatch(); },
     go(hash){ location.hash = hash; },
+    goToSection: goToSection,
     lastDsId: null
   };
 })();

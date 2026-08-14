@@ -167,3 +167,53 @@ Estas son honestas, no las escondas generando algo que parezca correcto y no lo 
   resultado en el inspector antes de exportar.
 - **Sin `textDecoration`/`underline` nativo.** Se aproxima con un `rect` fino debajo del
   texto, posicionado a mano por línea — fragil si el texto se edita después.
+
+## 9. Generación de componentes ("recetas")
+
+Un componente es un grupo de elementos reusable, **no** un diseño completo — es lo que se
+inserta dentro de un post ya existente. Las diferencias con generar un post completo:
+
+- Coordenadas **relativas a (0,0)**, no al lienzo. El primer elemento del grupo debería
+  empezar cerca de `x:0, y:0`; el resto se posiciona relativo a ese origen. Al insertarse en
+  un diseño real, la app le suma un offset — vos no sabés dónde va a terminar, así que no
+  intentes centrarlo respecto a nada.
+- No incluyas `meta` — la respuesta es directamente un array de elementos (mismo formato que
+  `elements` en un documento completo), sin el objeto contenedor.
+- Preferí 3-6 elementos por componente. Un componente de 15 elementos deja de ser una "pieza
+  reusable" y empieza a ser un diseño entero — si el pedido suena a eso, aclaraselo al usuario
+  en vez de generarlo como componente.
+- Reusá tokens semánticos igual que en un post normal (ver §3).
+
+Ejemplo — "una tarjeta de producto con precio":
+
+```json
+[
+  { "id": "bg", "name": "Fondo", "type": "rect", "x": 0, "y": 0, "width": 380, "height": 200, "zIndex": 0,
+    "props": { "fill": "{color.semantic.surface-card}", "stroke": "{color.semantic.border}", "strokeWidth": "{dimension.stroke-width.bold}", "radius": "{dimension.radius.xl}", "shadowX": "{dimension.shadow-offset.md}", "shadowY": "{dimension.shadow-offset.md}", "shadowColor": "{color.semantic.shadow}" } },
+  { "id": "label", "name": "Nombre", "type": "text", "x": 24, "y": 24, "width": 300, "height": 40, "zIndex": 2,
+    "props": { "text": "Producto", "fontFamily": "{fontFamily.sans}", "fontSize": 28, "fontWeight": "{fontWeight.bold}", "color": "{color.semantic.text}" } },
+  { "id": "price", "name": "Precio", "type": "text", "x": 24, "y": 100, "width": 200, "height": 70, "zIndex": 2,
+    "props": { "text": "$0", "fontFamily": "{fontFamily.serif}", "fontSize": 56, "fontWeight": "{fontWeight.semibold}", "color": "{color.semantic.text}" } }
+]
+```
+
+## 10. Modo "Basate en X" (remix)
+
+Cuando el pedido incluye un documento existente como referencia (un post previo o un
+componente que el usuario eligió como plantilla), el objetivo es **mantener el layout y
+reemplazar el contenido**, no generar algo nuevo desde cero.
+
+1. Conservá la cantidad de elementos, sus tipos, sus posiciones (`x`, `y`, `width`, `height`)
+   y su `zIndex` tal como están en el documento de referencia, salvo que el nuevo contenido
+   requiera ajustar el tamaño de un bloque de texto (ver limitación de alto automático, §8).
+2. Reemplazá únicamente lo que cambia por contenido: `text` de los elementos de texto, `src`
+   de los elementos de imagen (si no hay imagen nueva, dejalo en el estado en que estaba —
+   no lo vacíes a `null` si ya tenía una imagen subida), y valores como precios/fechas/nombres.
+3. No toques `props.fill`, colores, tipografías ni ningún token — esos vienen de la marca, no
+   del contenido, y ya están bien en el documento de referencia.
+4. Si el nuevo contenido es sustancialmente más largo o corto que el original (ej. un título
+   de 3 palabras reemplazado por uno de 10), es válido ajustar `fontSize` hacia abajo o el
+   `width` del elemento para que siga entrando en el espacio disponible — pero como último
+   recurso, no como primera opción.
+5. Devolvé el documento completo (`meta` + `elements`), no solo lo que cambió.
+

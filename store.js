@@ -75,11 +75,72 @@
     persist(); emit('change', { coll, type: 'delete', id });
   }
 
+  /* ---------------- merge de tokens generados por IA ----------------
+     La IA (ver TOKENS_CONTRACT.md) devuelve un árbol PARCIAL que toca
+     solo *.primitive.*, fontFamily.* y dimension.*. Nunca "semantic".
+     El merge pisa unicamente los $value de los paths que la IA
+     efectivamente devolvio; cualquier grupo/token que no menciono
+     queda intacto — incluye lo que la persona ya haya ajustado a mano
+     en el Brand Kit, que nunca se pierde por una regeneracion. */
+  function deepMergeTokens(target, partial){
+    for (const key in partial) {
+      const partialNode = partial[key];
+      if (!partialNode || typeof partialNode !== 'object') continue;
+      if ('$value' in partialNode) {
+        if (!target[key]) target[key] = { $value: null };
+        target[key].$value = partialNode.$value;
+        if (partialNode.$type) target[key].$type = partialNode.$type;
+      } else {
+        if (!target[key] || typeof target[key] !== 'object') target[key] = {};
+        deepMergeTokens(target[key], partialNode);
+      }
+    }
+    return target;
+  }
+
   /* ---------------- API pública ---------------- */
   window.Store = {
     on, off,
 
     getCurrentUser(){ return db.users[0]; },
+
+    getLastActiveBrandId(){ return db.session && db.session.lastActiveBrandId; },
+    setLastActiveBrandId(id){
+      db.session = db.session || {};
+      db.session.lastActiveBrandId = id;
+      persist();
+    },
+
+    /** Fusiona tokens parciales generados por IA sobre los tokens actuales
+     *  de un design system, sin pisar "semantic" ni tokens no mencionados.
+     *  Guarda un snapshot previo para poder deshacer (ver undoTokens). */
+    mergeAiTokens(dsId, partialTokens){
+      const ds = get('designSystems', dsId);
+      if (!ds) return null;
+      if (partialTokens && partialTokens.color && partialTokens.color.semantic) {
+        delete partialTokens.color.semantic; // defensa extra, ya lo bloquea el prompt/validator
+      }
+
+      ds.tokenHistory = ds.tokenHistory || [];
+      ds.tokenHistory.push(JSON.parse(JSON.stringify(ds.tokens))); // snapshot ANTES del cambio
+      if (ds.tokenHistory.length > 10) ds.tokenHistory.shift(); // tope: no crecer sin limite
+
+      deepMergeTokens(ds.tokens, partialTokens || {});
+      return update('designSystems', dsId, { tokens: ds.tokens, tokenHistory: ds.tokenHistory });
+    },
+
+    canUndoTokens(dsId){
+      const ds = get('designSystems', dsId);
+      return !!(ds && ds.tokenHistory && ds.tokenHistory.length > 0);
+    },
+
+    /** Revierte al snapshot inmediatamente anterior a la ultima regeneracion de IA. */
+    undoTokens(dsId){
+      const ds = get('designSystems', dsId);
+      if (!ds || !ds.tokenHistory || !ds.tokenHistory.length) return null;
+      const previous = ds.tokenHistory.pop();
+      return update('designSystems', dsId, { tokens: previous, tokenHistory: ds.tokenHistory });
+    },
 
     listBrands(){ return list('brands'); },
     getBrand(id){ return get('brands', id); },

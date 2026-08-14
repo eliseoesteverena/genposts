@@ -11,23 +11,93 @@
 <body>
 
 <div class="shell">
+
   <header class="shell-header">
-    <span class="shell-logo">◆</span>
-    <span class="shell-title">Studio</span>
-    <nav class="step-nav">
-      <button type="button" class="step-btn" data-step="brands" onclick="Router.go('#/brands')">1. Marca</button>
-      <button type="button" class="step-btn" data-step="design-system">2. Tokens</button>
-      <button type="button" class="step-btn" data-step="components">3. Componentes</button>
-      <button type="button" class="step-btn" data-step="editor">4. Editor</button>
-    </nav>
+    <button type="button" class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="shell-logo">Studio</span>
   </header>
 
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <span class="shell-logo">Studio</span>
+      <button type="button" class="fld-mini-btn" id="sidebarClose">Cerrar</button>
+    </div>
+    <nav class="side-nav">
+      <button type="button" class="side-nav-item" data-nav="home" onclick="Router.go('#/')">Inicio</button>
+      <button type="button" class="side-nav-item" data-nav="brands" onclick="Router.go('#/brands')">Mis marcas</button>
+      <button type="button" class="side-nav-item" data-nav="components" onclick="Router.goToSection('components')">Componentes</button>
+      <button type="button" class="side-nav-item" data-nav="posts" onclick="Router.goToSection('posts')">Mis posts</button>
+    </nav>
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">?</div>
+      <div class="sidebar-user-info">
+        <strong>Invitado</strong>
+        <span>Sin iniciar sesion</span>
+      </div>
+      <button type="button" class="fld-mini-btn sidebar-user-action">Iniciar sesion</button>
+    </div>
+  </aside>
+
   <main class="shell-main">
+
+    <section class="view" data-view="auth" hidden>
+      <div class="view-inner auth-inner">
+        <h1 class="view-title auth-title">Iniciar sesion</h1>
+        <input type="email" class="auth-email fld-input" placeholder="Email">
+        <div class="auth-name-field">
+          <input type="text" class="auth-name fld-input" placeholder="Tu nombre">
+        </div>
+        <input type="password" class="auth-password fld-input" placeholder="Contrasena">
+        <button type="button" class="download-btn auth-submit-btn">Entrar</button>
+        <p class="auth-status" hidden></p>
+        <button type="button" class="fld-mini-btn auth-toggle">No tenes cuenta? Crear una</button>
+      </div>
+    </section>
+
+    <section class="view" data-view="home" hidden>
+      <div class="view-inner home-inner">
+        <h1 class="view-title">Que queres crear?</h1>
+
+        <div class="home-action-row">
+          <button type="button" class="home-action-btn" data-action="post">Crear post</button>
+          <button type="button" class="home-action-btn" data-action="brand">Crear marca</button>
+        </div>
+
+        <textarea class="home-prompt" rows="3" placeholder="Describi que queres crear..."></textarea>
+
+        <div class="home-field home-brand-field">
+          <label>Marca</label>
+          <select class="home-brand-select fld-select"></select>
+        </div>
+
+        <div class="home-field home-base-field">
+          <label>Basate en</label>
+          <select class="home-base-select fld-select"></select>
+        </div>
+
+        <div class="home-field home-attach-field">
+          <label class="home-attach-label">Imagen (opcional)</label>
+          <div class="home-attach-row">
+            <label class="fld-mini-btn home-attach-btn">
+              Adjuntar
+              <input type="file" class="home-attach-input" accept="image/*" multiple hidden>
+            </label>
+            <div class="home-attach-list"></div>
+          </div>
+        </div>
+
+        <button type="button" class="download-btn home-submit-btn">Generar con IA</button>
+        <p class="home-status" hidden></p>
+      </div>
+    </section>
 
     <section class="view" data-view="brands" hidden>
       <div class="view-inner">
         <h1 class="view-title">Tus marcas</h1>
-        <p class="panel-hint">Cada marca tiene su propio design system, componentes y disenos.</p>
+        <p class="panel-hint">Cada marca tiene su propio design system, componentes y posts.</p>
         <form class="brand-create">
           <input type="text" placeholder="Nombre de la marca nueva" required>
           <button type="submit" class="download-btn" style="width:auto;">Crear marca</button>
@@ -39,7 +109,7 @@
     <section class="view" data-view="design-system" hidden>
       <div class="view-inner">
         <h1 class="view-title">Tu marca - <span class="ds-brand-name">-</span></h1>
-        <p class="panel-hint">Elegi tus colores, tipografias y estilo. Se aplican a todo lo que generes despues.</p>
+        <p class="panel-hint">Elegi tus colores, tipografias y estilo.</p>
 
         <div class="bk-preview" id="bkPreview">
           <span class="bk-preview-eyebrow">Marca</span>
@@ -47,6 +117,13 @@
           <p class="bk-preview-body">Asi se va a ver el texto en tus disenos.</p>
           <span class="bk-preview-chip">Acento</span>
         </div>
+
+        <div class="bk-ai-row">
+          <input type="text" class="bk-ai-prompt fld-input" placeholder="Pedile un ajuste a la IA (ej: mas calido, tonos tierra)...">
+          <button type="button" class="fld-mini-btn bk-ai-btn">Regenerar con IA</button>
+          <button type="button" class="fld-mini-btn bk-undo-btn" disabled>Deshacer ultimo cambio de IA</button>
+        </div>
+        <p class="bk-ai-status" hidden></p>
 
         <div class="bk-section">
           <span class="bk-section-title">Colores</span>
@@ -66,20 +143,34 @@
         <button type="button" class="fld-mini-btn bk-advanced-toggle" id="bkAdvancedToggle">Personalizar en detalle (avanzado) &gt;</button>
         <div class="ds-tokens-body" id="bkAdvancedBody" hidden></div>
 
-        <button type="button" class="download-btn ds-next-btn" style="max-width:280px;">Siguiente: Componentes</button>
+        <div class="ds-done-row">
+          <button type="button" class="fld-mini-btn ds-components-btn">Ir a Componentes</button>
+          <button type="button" class="download-btn ds-done-btn" style="width:auto;">Listo, ir al inicio</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" data-view="pick-brand" hidden>
+      <div class="view-inner">
+        <h1 class="view-title pb-title">Elegi una marca</h1>
+        <div class="brand-list pb-list"></div>
       </div>
     </section>
 
     <section class="view" data-view="components" hidden>
       <div class="view-inner">
         <h1 class="view-title">Componentes</h1>
-        <p class="panel-hint">Grupos de elementos reusables ("recetas") que despues se insertan en cualquier diseno desde el editor.</p>
+        <p class="panel-hint">Bloques reusables que se insertan en cualquier post.</p>
+        <div class="cmp-ai-row">
+          <input type="text" class="cmp-ai-prompt fld-input" placeholder="Describi el componente (ej: tarjeta de producto con precio)...">
+          <button type="button" class="fld-mini-btn cmp-ai-btn">Generar con IA</button>
+        </div>
+        <p class="cmp-ai-status" hidden></p>
         <form class="cmp-create">
-          <input type="text" placeholder="Nombre del componente nuevo" required>
-          <button type="submit" class="download-btn" style="width:auto;">Crear</button>
+          <input type="text" placeholder="O cread uno vacio con este nombre" required>
+          <button type="submit" class="download-btn" style="width:auto;">Crear vacio</button>
         </form>
         <div class="cmp-grid"></div>
-        <button type="button" class="download-btn cmp-next-btn" style="max-width:280px;">Siguiente: Editor</button>
       </div>
 
       <div class="cmp-editor" hidden>
@@ -91,8 +182,17 @@
       </div>
     </section>
 
+    <section class="view" data-view="posts" hidden>
+      <div class="view-inner">
+        <h1 class="view-title">Posts - <span class="posts-brand-name">-</span></h1>
+        <div class="posts-grid"></div>
+        <button type="button" class="download-btn posts-new-btn" style="max-width:220px;">+ Nuevo post</button>
+      </div>
+    </section>
+
     <section class="view view-editor" data-view="editor" hidden>
       <div class="editor-toolbar">
+        <button type="button" class="fld-mini-btn editor-back-btn">&lt; Mis posts</button>
         <strong class="editor-design-name">-</strong>
         <div class="format-row" id="formatRow">
           <button data-format="square" class="is-on">1:1</button>
@@ -125,6 +225,11 @@
     </div>
     <button type="button" class="fld-mini-btn" id="inspDrawerClose">Cerrar</button>
   </div>
+  <div class="insp-drawer-ai-row">
+    <input type="text" class="insp-ai-prompt fld-input" placeholder="Pedile un ajuste a la IA...">
+    <button type="button" class="fld-mini-btn insp-ai-btn">Aplicar</button>
+  </div>
+  <p class="insp-ai-status" hidden></p>
   <div class="insp-drawer-body" id="inspDrawerBody"></div>
 </aside>
 
@@ -143,18 +248,41 @@
   </div>
 </div>
 
+<script src="fonts.js"></script>
 <script src="tokens.js"></script>
 <script src="design.js"></script>
 <script src="components.js"></script>
 <script src="store.js"></script>
 <script src="fields.js"></script>
+<script src="validate.js"></script>
+<script src="ai.js"></script>
+<script src="compose.js"></script>
+<script src="auth-client.js"></script>
 <script src="render.js"></script>
 <script src="upload.js"></script>
 <script src="router.js"></script>
+<script src="screen-home.js"></script>
 <script src="screen-brands.js"></script>
 <script src="screen-design-system.js"></script>
+<script src="screen-pick-brand.js"></script>
 <script src="screen-components.js"></script>
+<script src="screen-posts.js"></script>
+<script src="screen-auth.js"></script>
 <script src="editor.js"></script>
-<script>Router.start();</script>
+<script>
+  document.getElementById('hamburgerBtn').addEventListener('click', function(){
+    document.getElementById('sidebar').classList.add('is-open');
+    document.getElementById('sidebarBackdrop').classList.add('is-open');
+  });
+  document.getElementById('sidebarClose').addEventListener('click', function(){
+    document.getElementById('sidebar').classList.remove('is-open');
+    document.getElementById('sidebarBackdrop').classList.remove('is-open');
+  });
+  document.getElementById('sidebarBackdrop').addEventListener('click', function(){
+    document.getElementById('sidebar').classList.remove('is-open');
+    document.getElementById('sidebarBackdrop').classList.remove('is-open');
+  });
+  Router.start();
+</script>
 </body>
 </html>

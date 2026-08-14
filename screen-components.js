@@ -76,6 +76,34 @@
     return [];
   }
 
+  async function generateWithAi(){
+    const el = document.querySelector('[data-view="components"]');
+    const promptInput = el.querySelector('.cmp-ai-prompt');
+    const status = el.querySelector('.cmp-ai-status');
+    const prompt = promptInput.value.trim();
+    if (!prompt) { status.hidden = false; status.classList.add('is-error'); status.textContent = 'Describi el componente primero.'; return; }
+
+    const btn = el.querySelector('.cmp-ai-btn');
+    btn.disabled = true;
+    status.hidden = false; status.classList.remove('is-error'); status.textContent = 'Generando...';
+
+    try {
+      const ds = Store.getDesignSystem(currentDsId);
+      const elements = await AI.generateComponent(prompt, ds.tokens);
+      const validation = Validate.validateComponentElements(elements);
+      if (!validation.valid) throw new Error(validation.errors.slice(0, 3).join('; '));
+      Store.createComponent(currentDsId, { name: prompt.slice(0, 40), description: prompt, elements: elements });
+      promptInput.value = '';
+      status.textContent = 'Componente creado.';
+      renderList();
+    } catch (err) {
+      status.classList.add('is-error');
+      status.textContent = 'Error: ' + err.message;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
   function wireCreate(){
     const el = document.querySelector('[data-view="components"]');
     const form = el.querySelector('.cmp-create');
@@ -89,14 +117,13 @@
       renderList();
     });
 
-    el.querySelector('.cmp-next-btn').addEventListener('click', () => {
-      Router.go('#/design-system/' + currentDsId + '/editor');
-    });
+    el.querySelector('.cmp-ai-btn').addEventListener('click', generateWithAi);
   }
   wireCreate();
 
   function render(params){
     currentDsId = params.dsId;
+    Store.setLastActiveBrandId(Store.getDesignSystem(currentDsId).brandId);
     const el = document.querySelector('[data-view="components"]');
     el.querySelector('.cmp-editor').hidden = true;
     renderList();

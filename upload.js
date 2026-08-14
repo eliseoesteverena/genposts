@@ -67,7 +67,7 @@
 
     if (targetElementId) {
       window.PostEngine.updateElement(targetElementId, {
-        props: { ...window.PostEngine.getElement(targetElementId).props, src: null, status: 'uploading' }
+        props: Object.assign({}, window.PostEngine.getElement(targetElementId).props, { src: null, status: 'uploading' })
       });
     }
     statusEl.hidden = false;
@@ -96,7 +96,7 @@
       if (targetElementId) {
         const el = window.PostEngine.getElement(targetElementId);
         window.PostEngine.updateElement(targetElementId, {
-          props: { ...el.props, src: data.url, status: 'ready' }
+          props: Object.assign({}, el.props, { src: data.url, status: 'ready' })
         });
       }
       statusEl.textContent = '¡Listo! ✓';
@@ -108,7 +108,7 @@
       if (targetElementId) {
         const el = window.PostEngine.getElement(targetElementId);
         window.PostEngine.updateElement(targetElementId, {
-          props: { ...el.props, src: null, status: 'empty' }
+          props: Object.assign({}, el.props, { src: null, status: 'empty' })
         });
       }
       showError('No se pudo subir (' + err.message + '). ¿Está desplegado ' + UPLOAD_ENDPOINT + '?');
