@@ -121,7 +121,7 @@
       "type": "object",
       "required": ["name", "color"],
       "properties": {
-        "name":  { "type": "string", "enum": ["sparkle", "doc", "pin", "arrow-right"] },
+        "name":  { "type": "string", "enum": ["sparkle", "doc", "pin", "arrow-right", "check", "x", "plus", "star", "heart"] },
         "color": { "$ref": "#/definitions/tokenOrColor" }
       }
     },

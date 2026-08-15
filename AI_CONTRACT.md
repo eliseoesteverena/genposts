@@ -28,7 +28,7 @@ JSON válido contra `schema.json`**, y nada más.
 |---|---|---|
 | `rect` | fondos, tarjetas, botones, marcos | `fill` |
 | `text` | cualquier texto | `text`, `fontFamily`, `fontSize`, `color` |
-| `icon` | íconos del set embebido: `sparkle`, `doc`, `pin`, `arrow-right` | `name`, `color` |
+| `icon` | íconos del set embebido: `sparkle`, `doc`, `pin`, `arrow-right`, `check`, `x`, `plus`, `star`, `heart` | `name`, `color` |
 | `image` | fotos/logos subidos por el usuario | `src`, `fit` |
 
 Ver `schema.json` → `definitions` para el detalle completo de cada `props`.

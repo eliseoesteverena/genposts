@@ -71,7 +71,7 @@
   }
   function selectOptions(key){
     if (key === 'align') return ['left','center','right'];
-    if (key === 'name') return ['sparkle','doc','pin','arrow-right'];
+    if (key === 'name') return ['sparkle','doc','pin','arrow-right','check','x','plus','star','heart'];
     if (key === 'fit') return ['contain','cover'];
     return [];
   }

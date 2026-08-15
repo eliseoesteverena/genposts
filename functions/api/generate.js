@@ -4,6 +4,15 @@
 // El nombre del modelo es configurable via GEMINI_MODEL (default abajo) porque estos
 // nombres cambian con el tiempo y no queremos tener que editar codigo para actualizarlo.
 
+// Import relativo cruzando fuera de functions/ hasta la raiz del proyecto:
+// se apoya en que el bundler de Cloudflare Pages Functions (esbuild) resuelve
+// imports relativos normales, no solo dentro de functions/. Si el deploy
+// fallara por esto, la alternativa es duplicar validate.js dentro de
+// functions/ - pero esa duplicacion es exactamente lo que causo el bug del
+// icono "check" (dos validadores que se desincronizaron), asi que vale la
+// pena confirmar que este import funcione antes de resignarse a duplicar.
+import { validateDesignDocument, validateComponentElements, validateBrandTokens } from '../../validate.js';
+
 const DEFAULT_MODEL = 'gemini-3.1-flash-lite';
 
 const CORS_HEADERS = {
@@ -26,7 +35,7 @@ const SYSTEM_PROMPTS = {
     'Reglas:\n' +
     '- Coordenadas relativas a (0,0): el grupo empieza cerca del origen, no del centro de ningun lienzo.\n' +
     '- 3 a 6 elementos. Cada elemento: id (kebab-case unico), name, type (rect|text|icon|image), x, y, width, height, zIndex, props.\n' +
-    '- rect.props requiere fill. text.props requiere text,fontFamily,fontSize,color. icon.props requiere name (sparkle|doc|pin|arrow-right) y color. image.props requiere src (null si no hay imagen) y fit.\n' +
+    '- rect.props requiere fill. text.props requiere text,fontFamily,fontSize,color. icon.props requiere name (sparkle|doc|pin|arrow-right|check|x|plus|star|heart) y color. image.props requiere src (null si no hay imagen) y fit.\n' +
     '- Usa referencias a tokens semanticos del design system dado (formato "{color.semantic.text}"), nunca valores crudos si existe un token aplicable.\n' +
     '- No generes flex ni contenedores anidados: todo es plano y absoluto.',
 
@@ -182,19 +191,21 @@ function json(body, status) {
 }
 
 function validateByKind(kind, data) {
-  const errors = [];
   if (kind === 'brand') {
-    if (typeof data !== 'object' || data === null) errors.push('debe ser un objeto');
-    if (data && data.color && data.color.semantic) errors.push('no debe incluir "semantic"');
-  } else if (kind === 'component') {
-    if (!Array.isArray(data)) errors.push('debe ser un array');
-    else data.forEach(function(el, i){
-      if (!el.id || !el.type || !el.props) errors.push('elemento[' + i + ']: faltan campos requeridos');
-    });
-  } else if (kind === 'post' || kind === 'remix') {
-    if (typeof data !== 'object' || !data.meta || !Array.isArray(data.elements)) errors.push('debe tener "meta" y "elements"');
-  } else if (kind === 'edit-element') {
-    if (typeof data !== 'object' || data === null) errors.push('debe ser un objeto de props');
+    return validateBrandTokens(data);
   }
-  return { valid: errors.length === 0, errors: errors };
+  if (kind === 'component') {
+    return validateComponentElements(data);
+  }
+  if (kind === 'post' || kind === 'remix') {
+    return validateDesignDocument(data);
+  }
+  if (kind === 'edit-element') {
+    // props sueltas de un elemento: no tiene "type" propio para validar
+    // contra REQUIRED_BY_TYPE sin mas contexto, se mantiene una validacion
+    // minima aca (es el unico caso donde no reusamos validate.js entero).
+    const errors = (typeof data !== 'object' || data === null) ? ['debe ser un objeto de props'] : [];
+    return { valid: errors.length === 0, errors: errors };
+  }
+  return { valid: false, errors: ['kind desconocido: ' + kind] };
 }

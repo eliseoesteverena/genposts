@@ -114,7 +114,7 @@
       strokeWidth: 'dimension', radius: 'dimension', shadowX: 'dimension', shadowY: 'dimension', fontSize: 'dimension',
       fontFamily: 'fontFamily', fontWeight: 'fontWeight', text: 'longtext', align: 'select', name: 'select', fit: 'select', src: 'image'
     }[key] || 'text');
-    const selectOptions = (key) => key === 'align' ? ['left','center','right'] : key === 'name' ? ['sparkle','doc','pin','arrow-right'] : key === 'fit' ? ['contain','cover'] : [];
+    const selectOptions = (key) => key === 'align' ? ['left','center','right'] : key === 'name' ? ['sparkle','doc','pin','arrow-right','check','x','plus','star','heart'] : key === 'fit' ? ['contain','cover'] : [];
 
     Object.keys(elDef.props).forEach(key => {
       if (['highlightWords', 'lineHeight', 'alt', 'status'].includes(key)) return;
