@@ -4,7 +4,7 @@
 // El nombre del modelo es configurable via GEMINI_MODEL (default abajo) porque estos
 // nombres cambian con el tiempo y no queremos tener que editar codigo para actualizarlo.
 
-const DEFAULT_MODEL = 'gemini-flash-latest';
+const DEFAULT_MODEL = 'gemini-3.1-flash-lite';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
