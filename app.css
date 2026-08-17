@@ -203,37 +203,139 @@ body{ margin:0; background: var(--ink); min-height:100vh; }
 .chip-toggle input{ width:1rem; height:1rem; accent-color: var(--ink); flex-shrink:0; }
 
 /* =========================================================
-   INSPECTOR — drawer desde la DERECHA (mobile-first)
+   INSPECTOR — patron Canva: toolbar flotante + tabbar inferior
+   + panel deslizante (en vez de un cajon lateral fijo)
    ========================================================= */
-.insp-drawer-backdrop{
-  position: fixed; inset:0; background: rgba(19,18,17,.45); z-index: 70;
-  opacity:0; pointer-events:none; transition: opacity .18s ease;
-}
-.insp-drawer-backdrop.is-open{ opacity:1; pointer-events:auto; }
 
-.insp-drawer{
-  position: fixed; top:0; right:0; bottom:0; z-index: 80;
-  width: min(88vw, 380px);
-  background: var(--card);
-  border-left: var(--line);
-  box-shadow: -8px 0 24px rgba(0,0,0,.25);
-  display:flex; flex-direction:column;
-  transform: translateX(100%);
-  transition: transform .2s ease;
-  overflow: hidden;
+/* toolbar flotante sobre el elemento seleccionado */
+.insp-float-toolbar{
+  position: fixed; z-index: 85;
+  gap:.3rem;
+  background: var(--ink); border-radius: 999px; padding:.3rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
 }
-.insp-drawer.is-open{ transform: translateX(0); }
-.insp-drawer-head{
-  display:flex; align-items:center; justify-content:space-between; gap:.5rem;
-  padding: 1rem; border-bottom: var(--line); flex-shrink:0;
+.insp-float-toolbar:not([hidden]){ display:flex; }
+.insp-float-btn{
+  width:2.1rem; height:2.1rem; border:none; border-radius:50%; background:transparent; color:#fff;
+  font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
 }
-.insp-drawer-head strong{ display:block; font-size:.88rem; color:var(--ink); word-break:break-word; }
-.insp-drawer-body{ flex:1; overflow-y:auto; padding: 1rem; min-width:0; }
+.insp-float-btn:active{ background: rgba(255,255,255,.15); }
+.insp-float-btn[data-action="delete"]{ color:#ff8a80; }
+
+/* barra de pestañas inferior, siempre visible con seleccion activa */
+.insp-tabbar{
+  position: fixed; left:0; right:0; bottom:0; z-index: 82;
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  background: var(--card); border-top: var(--line);
+  padding: .3rem .3rem calc(.3rem + env(safe-area-inset-bottom, 0px));
+}
+.insp-tabbar:not([hidden]){ display:flex; }
+.insp-tab{
+  flex:1 0 auto; min-width: 4.2rem; display:flex; flex-direction:column; align-items:center; gap:.15rem;
+  border:none; background:transparent; padding:.4rem .3rem; cursor:pointer; color: var(--ink-60);
+}
+.insp-tab-icon{ font-size:1.05rem; line-height:1; }
+.insp-tab-label{ font-size:.62rem; font-weight:600; }
+.insp-tab.is-active{ color: #0066ff; }
+
+/* panel deslizante, arriba de la tabbar */
+.insp-panel-backdrop{
+  position: fixed; inset:0; z-index:79; background: rgba(19,18,17,.35);
+}
+.insp-panel{
+  position: fixed; left:0; right:0; z-index: 81;
+  bottom: 3.1rem;
+  max-height: 42vh;
+  background: var(--card); border-top: var(--line);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: 0 -6px 20px rgba(0,0,0,.18);
+  flex-direction:column;
+}
+.insp-panel:not([hidden]){ display:flex; }
+.insp-panel-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: .75rem 1rem; border-bottom: 1px dashed var(--ink-15); flex-shrink:0;
+}
+.insp-panel-head strong{ font-size:.85rem; color: var(--ink); }
+.insp-panel-check{
+  width:1.9rem; height:1.9rem; border-radius:50%; border: var(--line); background: var(--ink); color:#fff;
+  font-size:.85rem; cursor:pointer;
+}
+.insp-panel-body{ padding: 1rem; overflow-y:auto; }
+
+/* filas de chips horizontales scrolleables (colores, fuentes, iconos) */
+.insp-chip-row{ display:flex; gap:.5rem; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:.3rem; }
+.insp-chip-row--wrap{ flex-wrap:wrap; overflow-x:visible; }
+.insp-color-swatch{
+  width:2.4rem; height:2.4rem; border-radius:50%; flex-shrink:0; cursor:pointer;
+  border: 2px solid var(--ink-15);
+}
+.insp-color-swatch.is-selected{ border-color:#0066ff; box-shadow: 0 0 0 2px rgba(0,102,255,.25); }
+.insp-custom-color-row{ display:flex; align-items:center; gap:.6rem; margin-top:.75rem; }
+
+.insp-font-chip{
+  flex-shrink:0; border: var(--line); border-radius: var(--r-md); background: var(--card);
+  padding:.5rem .85rem; font-size:.95rem; cursor:pointer; white-space:nowrap;
+}
+.insp-font-chip.is-selected{ background: var(--yellow-pale); border-color: var(--ink); }
+
+.insp-icon-chip{
+  flex-shrink:0; border: var(--line); border-radius: var(--r-md); background: var(--card);
+  padding:.5rem .7rem; font-size:.78rem; cursor:pointer; text-transform:capitalize;
+}
+.insp-icon-chip.is-selected{ background: var(--yellow-pale); border-color: var(--ink); }
+
+/* segmentado (alinear, orden) */
+.insp-segmented{ display:flex; gap:.4rem; margin-top:.6rem; }
+.insp-segmented-btn{
+  flex:1; border: var(--line); border-radius: var(--r-md); background: var(--card);
+  padding:.5rem; font-size:.78rem; font-weight:600; cursor:pointer;
+}
+.insp-segmented-btn.is-selected{ background: var(--ink); color:#fff; }
+
+/* sliders (estilo: radio/borde/sombra) */
+.insp-slider-row{ margin-bottom: 1rem; }
+.insp-slider-controls{ display:flex; align-items:center; gap:.6rem; margin-top:.3rem; }
+.insp-slider-controls input[type="range"]{ flex:1; accent-color: var(--ink); }
+.insp-slider-num{ width:3.5rem; flex-shrink:0; border: var(--line); border-radius: var(--r-sm); padding:.3rem; font-size:.8rem; text-align:center; }
+
+.insp-content-textarea{ width:100%; min-height:6rem; padding:.7rem; font-size:.9rem; resize:vertical; }
 
 .insp-geo{ display:grid; grid-template-columns: 1fr 1fr; gap:.5rem; }
 .insp-geo-field{ display:flex; flex-direction:column; gap:.2rem; font-size:.66rem; color:var(--ink-60); font-family:var(--font-mono); min-width:0; }
 .insp-geo-field input{ width:100%; min-width:0; border: var(--line); border-radius: var(--r-sm); padding:.35rem .4rem; font-size:.82rem; font-family: var(--font-sans); }
 .insp-divider{ border-top: 1px dashed var(--ink-15); margin: .85rem 0; }
+
+.insp-more-ai-row{ display:flex; gap:.5rem; }
+.insp-more-ai-row .fld-input{ flex:1; }
+.insp-ai-status{ font-size:.72rem; color: var(--ink-40); margin: .4rem 0 0; }
+.insp-ai-status.is-error{ color: var(--danger); }
+
+/* =========================================================
+   MENU DEL DOCUMENTO (boton "..." del toolbar del editor)
+   ========================================================= */
+.editor-menu-btn{
+  margin-left:auto; width:2.2rem; height:2.2rem; border-radius:50%; border: var(--line);
+  background: var(--card); color: var(--ink); font-size:1.1rem; cursor:pointer;
+}
+.doc-menu-backdrop{ position: fixed; inset:0; z-index:90; background: rgba(19,18,17,.4); }
+.doc-menu{
+  position: fixed; left:0; right:0; bottom:0; z-index:91;
+  background: var(--card); border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: 0 -8px 24px rgba(0,0,0,.2);
+  padding: .5rem 0 calc(1rem + env(safe-area-inset-bottom, 0px));
+  max-width: 480px; margin: 0 auto;
+}
+.doc-menu-drag{ width:2.2rem; height:4px; background: var(--ink-15); border-radius:2px; margin: .6rem auto; }
+.doc-menu-head{ padding: .5rem 1.25rem 1rem; border-bottom: 1px dashed var(--ink-15); margin-bottom:.4rem; }
+.doc-menu-head strong{ display:block; font-size:1rem; color: var(--ink); }
+.doc-menu-head .doc-menu-meta{ font-size:.72rem; color: var(--ink-40); }
+.doc-menu-item{
+  width:100%; display:flex; align-items:center; gap:.75rem; text-align:left;
+  border:none; background:transparent; padding:.85rem 1.25rem; font-size:.9rem; color: var(--ink); cursor:pointer;
+}
+.doc-menu-item span{ width:1.4rem; text-align:center; }
+.doc-menu-item--danger{ color: var(--danger); }
 
 /* =========================================================
    FIELDS — patrón compartido tokens/componentes/inspector
@@ -329,7 +431,8 @@ input[type="number"]{ width:100%; min-width:0; }
   width:100%; border: var(--line); border-radius: var(--r-md); padding:.85rem; font-size:.92rem;
   font-family: var(--font-sans); resize:vertical; min-height:4.5rem;
 }
-.home-field{ display:flex; flex-direction:column; gap:.35rem; }
+.home-field{ flex-direction:column; gap:.35rem; }
+.home-field:not([hidden]){ display:flex; }
 .home-field label{ font-size:.72rem; font-weight:600; color: rgba(247,245,240,.6); }
 .home-attach-row{ display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
 .home-attach-btn{ position:relative; }
@@ -351,11 +454,6 @@ input[type="number"]{ width:100%; min-width:0; }
 .bk-ai-status, .cmp-ai-status{ font-size:.78rem; color: rgba(247,245,240,.6); margin:0; }
 .bk-ai-status.is-error, .cmp-ai-status.is-error{ color:#ff8a80; }
 .ds-done-row{ display:flex; gap:.6rem; flex-wrap:wrap; }
-
-.insp-drawer-ai-row{ display:flex; gap:.5rem; padding: 0 1rem; margin-top:.25rem; }
-.insp-drawer-ai-row .fld-input{ flex:1; }
-.insp-ai-status{ font-size:.72rem; color: var(--ink-40); margin: .3rem 1rem 0; }
-.insp-ai-status.is-error{ color: var(--danger); }
 
 /* =========================================================
    TARJETAS DE MARCA (selector standalone) Y POSTS
@@ -379,7 +477,8 @@ input[type="number"]{ width:100%; min-width:0; }
   .view{ padding: 1rem .75rem 2.5rem; }
   .editor-toolbar{ gap:.4rem; padding:.6rem .75rem; }
   .format-row button{ padding:.35rem .45rem; font-size:.7rem; }
-  .insp-drawer{ width: 92vw; }
+  .insp-panel{ max-height: 46vh; }
+  .insp-tab{ min-width: 3.6rem; }
   .fld-select, .fld-input{ flex-basis: 100%; }
   .home-action-row{ flex-direction:column; }
 }

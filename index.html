@@ -203,7 +203,7 @@
         <label class="chip-toggle chip-toggle--compact">
           <input type="checkbox" id="toggleDoodles" checked> Destellos
         </label>
-        <button class="download-btn editor-download" id="downloadBtn">Descargar JPG</button>
+        <button type="button" class="editor-menu-btn" id="editorMenuBtn" aria-label="Menu del diseno">&#8942;</button>
       </div>
 
       <div class="stage">
@@ -216,22 +216,41 @@
   </main>
 </div>
 
-<div class="insp-drawer-backdrop" id="inspDrawerBackdrop"></div>
-<aside class="insp-drawer" id="inspDrawer">
-  <div class="insp-drawer-head">
-    <div>
-      <strong id="inspDrawerTitle">-</strong>
-      <span class="fld-badge is-literal" id="inspDrawerType">-</span>
-    </div>
-    <button type="button" class="fld-mini-btn" id="inspDrawerClose">Cerrar</button>
+<!-- MENU DEL DISEÑO (los "3 puntos" del toolbar) -->
+<div class="doc-menu-backdrop" id="docMenuBackdrop"></div>
+<div class="doc-menu" id="docMenu" hidden>
+  <div class="doc-menu-drag"></div>
+  <div class="doc-menu-head">
+    <strong class="doc-menu-name">-</strong>
+    <span class="doc-menu-meta">-</span>
   </div>
-  <div class="insp-drawer-ai-row">
-    <input type="text" class="insp-ai-prompt fld-input" placeholder="Pedile un ajuste a la IA...">
-    <button type="button" class="fld-mini-btn insp-ai-btn">Aplicar</button>
+  <button type="button" class="doc-menu-item" id="docMenuRename"><span>&#9998;</span> Renombrar</button>
+  <button type="button" class="doc-menu-item" id="docMenuDownload"><span>&#8595;</span> Descargar JPG</button>
+  <button type="button" class="doc-menu-item" id="docMenuDuplicate"><span>&#8862;</span> Duplicar post</button>
+  <button type="button" class="doc-menu-item doc-menu-item--danger" id="docMenuDelete"><span>&#128465;</span> Eliminar post</button>
+</div>
+
+<!-- TOOLBAR FLOTANTE — aparece sobre el elemento seleccionado -->
+<div class="insp-float-toolbar" id="inspFloatToolbar" hidden>
+  <button type="button" class="insp-float-btn" data-action="ai" title="IA">&#10022;</button>
+  <button type="button" class="insp-float-btn" data-action="duplicate" title="Duplicar">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="1.5"/><path d="M4 16V5.5A1.5 1.5 0 0 1 5.5 4H16"/></svg>
+  </button>
+  <button type="button" class="insp-float-btn" data-action="delete" title="Eliminar">&#128465;</button>
+</div>
+
+<!-- PANEL DE PROPIEDADES — se abre arriba de la barra de pestañas -->
+<div class="insp-panel-backdrop" id="inspPanelBackdrop"></div>
+<div class="insp-panel" id="inspPanel" hidden>
+  <div class="insp-panel-head">
+    <strong id="inspPanelTitle">-</strong>
+    <button type="button" class="insp-panel-check" id="inspPanelClose">&#10003;</button>
   </div>
-  <p class="insp-ai-status" hidden></p>
-  <div class="insp-drawer-body" id="inspDrawerBody"></div>
-</aside>
+  <div class="insp-panel-body" id="inspPanelBody"></div>
+</div>
+
+<!-- BARRA DE PESTAÑAS — siempre visible mientras haya un elemento seleccionado -->
+<div class="insp-tabbar" id="inspTabbar" hidden></div>
 
 <div class="upload-modal" id="uploadModal" hidden>
   <div class="upload-modal-card">
